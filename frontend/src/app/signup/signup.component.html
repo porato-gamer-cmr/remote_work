@@ -1,0 +1,82 @@
+<div class="container-fluid">
+    <div class="row my-5">
+        <div class="col-12 col-lg-6 d-none d-lg-block mt-3">
+            <img src="assets/logo.png" id="logo" style="width: 600px; height: 515px;">
+        </div>
+        <div class="col mt-3 col-12 col-md-9 col-lg-6 mx-auto">
+            <div class="card my-4 my-lg-0">
+                <div class="card-header">S'inscrire</div>
+                <form (ngSubmit)="signup(f)" #f="ngForm">
+                    <div class="card-body">
+                    <label for="name">Courriel</label>
+                    <div class="input-group mb-4">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white px-4 border-right-0">
+                                <i class="fa fa-user text-muted"></i>
+                            </span>
+                        </div>
+                        <input id="name" type="text" name="courriel" placeholder="courriel" class="form-control bg-white" ngModel autocomplete="off">
+                    </div>
+                    <label for="name">Nom</label>
+                    <div class="input-group mb-4">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white px-4 border-right-0">
+                                <i class="fa fa-user text-muted"></i>
+                            </span>
+                        </div>
+                        <input id="name" type="email" name="name" placeholder="name" class="form-control bg-white" ngModel autocomplete="off">
+                    </div>
+                    <label for="password">Mot de Passe</label>
+                    <div class="input-group mb-4" id="show_hide_password">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white px-4 border-right-0 fa fa-lock text-muted">
+                            </span>
+                        </div>
+                        <input id="password" type="password" name="password" placeholder="mot de passe" class="form-control bg-white border-right-0" ngModel>
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white px-4 border-left-0">
+                               <!-- <a href=""><i class="fa fa-eye-slash text-muted"></i></a> -->
+                            </span>
+                        </div>
+                    </div>
+                    <label for="superieur">Superieur</label>
+                    <div class="input-group mb-4">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white px-4 border-right-0 fa fa-lock text-muted">
+                            </span>
+                        </div>
+                        <select name="superieur" class="form-select bg-white" ngModel>
+                            <option *ngFor="let user of users" value="{{ user.id }}">{{ user.name }}</option>
+                        </select>
+                    </div>
+                    <label for="role">Role</label>
+                    <div class="input-group mb-4">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white px-4 border-right-0 fa fa-lock text-muted">
+                            </span>
+                        </div>
+                        <select name="role" class="form-select bg-white" ngModel>
+                            <option value="normal">normal</option>
+                            <option value="rmg">RMG</option>
+                            <option value="cgai">CGAI</option>
+                            <option value="dg">DG</option>
+                            <option value="informatique">Informatique</option>
+                        </select>
+                    </div>
+                    </div>
+                    <div class="text-muted font-italic" *ngIf="!isSignup">
+                        <small>Attention:
+                            <span class="text-danger font-weight-700">Inscription incorrect</span>
+                        </small>
+                    </div>
+                    <div class="card-footer" style="height: 4em">
+                        <div class="form-group row">
+                            <div class="col mt-1"><a href='/signin'><u>se connecter</u></a></div>
+                            <div class="col text-right mt-n3"><button type="submit" class="btn btn-primary mt-3">Submit</button></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,49 @@
+<div class="container-fluid">
+    <div class="row my-5">
+        
+        <div class="col mt-3 col-12 col-md-9 col-lg-5 mx-auto">
+            <div class="card my-4 my-lg-0">
+                <div class="card-header">Connexion</div>
+                <div class=""></div>
+                <form (ngSubmit)="signin(f)" #f="ngForm">
+                    <div class="card-body">
+                    <label for="name">Courriel</label>
+                    <div class="input-group mb-4">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white px-4 border-right-0">
+                                <i class="fa fa-user text-muted"></i>
+                            </span>
+                        </div>
+                        <input id="name" type="email" name="courriel" placeholder="courriel" class="form-control bg-white" ngModel autocomplete="off">
+                    </div>
+                    <label for="password">Mot de Passe</label>
+                    <div class="input-group mb-4" id="show_hide_password">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white px-4 border-right-0 fa fa-lock text-muted">
+                            </span>
+                        </div>
+                        <input id="password" type="password" name="password" placeholder="mot de passe" class="form-control bg-white border-right-0" ngModel>
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white px-4 border-left-0">
+                               <!-- <a href=""><i class="fa fa-eye-slash text-muted"></i></a> -->
+                            </span>
+                        </div>
+                    </div>
+                    <div class="text-muted font-italic" *ngIf="!isLogging">
+                        <small>Attention:
+                            <span class="text-danger font-weight-700">Courriel ou mot de passe incorrect</span>
+                        </small>
+                    </div>
+                    <div><a href="#"><i class="fa fa-chevron-right mr-1"></i>Mot de passe oublié?</a></div>
+                    </div>
+                    <div class="card-footer" style="height: 4em">
+                        <div class="form-group row">
+                            <div class="col text-right mt-n3"><button type="submit" class="btn btn-primary mt-3">Submit</button></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,8 @@
+<app-container></app-container>
+  <form (ngSubmit)="sendFile(f)" #f="ngForm">
+    <input type="file" name="fichier" ngModel (change)="test($event)">
+    
+    <button class="btn btn-primary" type="submit" >Valider</button>
+    
+  </form>
+

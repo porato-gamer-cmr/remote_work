@@ -1,0 +1,590 @@
+<!-- header of the application-->
+<app-container></app-container>
+<div class="row">
+  <div class="col">
+    <ul class="nav nav-tabs" id="mytab" role="tablist">
+      <li class="nav-item" (click)="updateDisplay('False')">
+        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#myApprov" role="tab" aria-controls="home" aria-selected="true">Mes approvs</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="profile-tab" data-toggle="tab" href="#otherApprov" role="tab" aria-controls="profile" aria-selected="true">Autres approvs</a>
+      </li>
+      <li class="nav-item" *ngIf=" role == 'rmg' || role=='informatique' "  (click)="updateDisplay('True')">
+        <a class="nav-link" id="contact-tab" data-toggle="tab" href="#rmgApprov" role="tab" aria-controls="contact" aria-selected="true">Demandes</a>
+      </li>
+      <li class="nav-item" (click)="updateDisplay('True')">
+        <a class="nav-link" id="personnalticket-tab" data-toggle="tab" href="#personnalTicketApprov" role="tab" aria-controls="personnalticket" aria-selected="true">MesTickets</a>
+      </li>
+      <li class="nav-item" *ngIf="role=='rmg'" (click)="updateDisplay('False')">
+        <a class="nav-link" id="ticket-tab" data-toggle="tab" href="#ticketApprov" role="tab" aria-controls="ticket" aria-selected="true">Tickets</a>
+      </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+      <div class="tab-pane fade show active" id="myApprov" role="tabpanel" aria-labelledby="home-tab">
+        <div class="row">
+          <div class="col">
+            <button class="btn btn-success" data-toggle="modal" data-target="#createapprovform" (click)="resetList()"><i class="fa fa-user-plus"></i></button>
+            <button class="btn btn-success" data-toggle="modal" data-target="#"><i class="fa fa-upload"></i></button>
+            <button class="btn btn-success"><i class="fa fa-download"></i></button>
+          </div>
+          <div class="col">
+              <input class="input_search" placeholder="search"  autocomplete="off">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <table class="table table-bordered">
+              <thead>
+                <th>Demandes envoyées</th>
+                <th>Demandes acceptées</th>
+                <th>Demandes rejetées</th>
+                <th>Demandes encours</th>
+                <th>Demandes annulées</th>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{{ approvStats.all }}</td>
+                  <td>{{ approvStats.success }}</td>
+                  <td>{{ approvStats.reject }}</td>
+                  <td>{{ approvStats.waiting }}</td>
+                  <td>{{ approvStats.cancel }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!--Personnal approvs-->
+        <div class="row" id="tableau">
+          <div class="col">
+              <table class="table table-bordered">
+                <thead>
+                  <tr class="first_row_table">
+                    <th>N°</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="row_table"  *ngFor="let approv of approvs; let index=index;">
+                    <td>{{ approv.id }}</td>
+                    <td>
+                      <i *ngIf="approv.higherDecision==1 && approv.infoDecision==1" class="fa fa-circle" style="color: green;"></i>
+                      <i *ngIf="(approv.higherDecision==1 && approv.infoDecision==0) || (approv.higherDecision==0 && approv.infoDecision==0) || (approv.higherDecision==0 && approv.infoDecision==1)"  class="fa fa-circle" style="color: cyan;"></i>
+                      <i *ngIf="approv.higherDecision==3" class="fa fa-circle" style="color: red;"></i>
+                      <i *ngIf="(approv.higherDecision==1 && approv.infoDecision==2) || (approv.higherDecision==2 && approv.infoDecision==0)"  class="fa fa-circle" style="color: yellow;"></i>
+                    </td>
+                    <td> {{ approv.instant }} </td>
+                    <td class="non-align">
+                      <i class="fa fa-info mr-3" (click)="infoApprovs(approv.id, 'approv')" data-toggle="modal" data-target="#infoApprov" ></i>
+                      <i class="fa fa-pencil mr-3" (click)="infoApprovs(approv.id, 'approv')" data-toggle="modal" data-target="#modifapprovform"></i>
+                      <i class="fa fa-times-circle mr-3" (click)="lockapprov(approv.id)" *ngIf="approv.higherDecision==1 && approv.infoDecision==1"></i>
+                      <i class="fa fa-trash mr-3" (click)="deleteapprov(approv.id)" *ngIf="(approv.higherDecision==0 && approv.infoDecision==1) || (approv.higherDecision==0 && approv.infoDecision==0)"></i>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+          </div>
+        </div>
+        <!--End of personnal approvs-->
+      </div>
+      <div class="tab-pane fade" id="otherApprov" role="tabpanel" aria-labelledby="profile-tab">
+        <div class="row">
+          <div class="col">
+            <input class="input_search" placeholder="search" name="search" [(ngModel)]="e" autocomplete="off">
+          </div>
+        </div>
+        <!--Other approvs-->
+        <div class="row" id="tableau">
+          <div class="col">
+            <table class="table table-bordered">
+              <thead>
+                <tr class="first_row_table">
+                  <th>N°</th>
+                  <th>Utilisateur</th>
+                  <th>Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="row_table" [ngStyle]="{'background-color': approv.higherDecision === 1 ? 'yellow' : 'pink'}" *ngFor="let approv of otherApprovs; let index=index;">
+                  <td>{{ approv.id }}</td>
+                  <td>{{ approv.user }}</td>
+                  <td> {{ approv.instant }} </td>
+                  <td>
+                    <i class="fa fa-info mr-3" (click)="infoApprovs(approv.id, 'approv')" data-toggle="modal" data-target="#specialInfoApprov" ></i>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+         </div>
+        <!--End of other approvs-->
+      </div>
+
+      <div class="tab-pane fade" id="rmgApprov" role="tabpanel" aria-labelledby="contact-tab">
+        <div class="row">
+          <div class="col">
+            <input class="input_search" placeholder="search" name="search" autocomplete="off">
+          </div>
+        </div>
+        <!--Spécila Approvs-->
+        <div class="row" id="tableau">
+          <div class="col">
+            <table class="table table-bordered">
+              <thead>
+                <tr class="first_row_table">
+                  <th>N°</th>
+                  <th>Utilisateur</th>
+                  <th>Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="row_table" *ngFor="let approv of specialApprovs; let index=index;">
+                  <td>{{ approv.id }}</td>
+                  <td>{{ approv.user }}</td>
+                  <td> {{ approv.instant }} </td>
+                  <td>
+                    <i class="fa fa-info mr-3" (click)="infoApprovs(approv.id, 'approv')" data-toggle="modal" data-target="#infoApprov"></i>
+                    <i class="fa fa-plus mr-3" *ngIf="role=='rmg' " (click)="infoApprovs(approv.id, 'ticket')" data-toggle="modal" data-target="#addTicketApprov"></i>
+                    <i class="fa fa-book mr-3" *ngIf="role=='rmg' " (click)="listTicketApprov(approv.id)" data-toggle="modal" data-target="#listTicketApprov"></i>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!--End of  special approvs -->
+      </div>
+
+      <div class="tab-pane fade" id="personnalTicketApprov" role="tabpanel" aria-labelledby="profile-tab">
+        <div class="row">
+          <div class="col">
+            <input class="input_search" placeholder="search" name="search" [(ngModel)]="e" autocomplete="off">
+          </div>
+        </div>
+        <!--Personnalticket approvs-->
+        <div class="row" id="tableau">
+          <div class="col">
+              <table class="table table-bordered">
+                  <thead>
+                    <tr class="first_row_table">
+                      <th>N°</th>
+                      <th>Status</th>
+                      <th>Date</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="row_table" *ngFor="let ticket of personnalTicketApprovs; let index=index;">
+                      <td>{{ ticket.id }}</td>
+                      <td>
+                        <i *ngIf="ticket.userDecision==1" class="fa fa-circle" style="color: green;"></i>
+                        <i *ngIf="ticket.userDecision==0"  class="fa fa-circle" style="color: orange;"></i>
+                      </td>
+                      <td> {{ ticket.instant }} </td>
+                      <td>
+                        <i class="fa fa-info mr-3" (click)="infoTicketApprovs(ticket.id)" data-toggle="modal" data-target="#infoTicketApprovForm"></i>
+                        <i class="fa fa-pencil mr-3" (click)="infoTicketApprovs(ticket.id)" data-toggle="modal" data-target="#modifTicket"></i>
+                        <i class="fa fa-trash mr-3" (click)="deleteTicketApprovs(ticket.id)"></i>
+                      </td>
+                    </tr>
+                  </tbody>
+              </table>
+          </div>
+        </div>
+        <!--End of Personnalticket approvs-->
+      </div>
+
+      <div class="tab-pane fade" id="ticketApprov" role="tabpanel" aria-labelledby="profile-tab">
+        <div class="row">
+          <div class="col">
+            <input class="input_search" placeholder="search" name="search" [(ngModel)]="e" autocomplete="off">
+          </div>
+        </div>
+        <!--ticket approvs-->
+        <div class="row" id="tableau">
+          <div class="col">
+            <table class="table table-bordered">
+                <thead>
+                  <tr class="first_row_table">
+                    <th>N°</th>
+                    <th>Status</th>
+                    <th>Utilisateur</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="row_table" *ngFor="let ticket of ticketApprovs; let index=index;">
+                    <td>{{ ticket.id }}</td>
+                    <td>
+                      <i *ngIf="ticket.userDecision==1" class="fa fa-circle" style="color: green;"></i>
+                      <i *ngIf="ticket.userDecision==0"  class="fa fa-circle" style="color: orange;"></i>
+                    </td>
+                    <td> {{ ticket.user }} </td>
+                    <td> {{ ticket.instant }} </td>
+                    <td>
+                      <i class="fa fa-info mr-3" (click)="infoTicketApprovs(ticket.id)" data-toggle="modal" data-target="#infoTicketApprovForm"></i>
+                      <i class="fa fa-pencil mr-3" (click)="infoTicketApprovs(ticket.id)" data-toggle="modal" data-target="#modifTicket"></i>
+                      <i class="fa fa-trash mr-3" (click)="deleteTicketApprovs(ticket.id)"></i>
+                    </td>
+                  </tr>
+                </tbody>
+            </table>
+          </div>
+         </div>
+        <!--End of ticket approvs-->
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    
+  <!--Start Info Approv Modal-->
+  <div class="modal" id="infoApprov">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Info coupon</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <table class="table table-bordered">
+            <thead>
+              <tr class="first_row_table">
+                <th>Produits</th>
+                <th>Quantité</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="row_table" *ngFor="let approv of listproduits; let index=index;">
+                <td>{{ approv.product }}</td>
+                <td>{{ approv.quantity }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="row" *ngIf=" role=='informatique' && display ">
+            <div class="col"> <button class="btn btn-success" (click)="decision('valider', 'informatique')">valider</button> </div>
+            <div class="col"> <button class="btn btn-warning" (click)="decision('rejeter', 'informatique')">rejeter</button> </div>
+            <div class="col"> <button class="btn btn-danger" (click)="decision('annuler', 'informatique')">Annuler</button> </div>
+          </div>
+          <i>{{ message }}</i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+   <!--Start Info Approv Modal-->
+   <div class="modal" id="listTicketApprov">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Liste Tickets</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <table class="table table-bordered">
+            <thead>
+              <tr class="first_row_table">
+                <th>N°</th>
+                <th>Date</th>
+                <th>Decision</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="row_table" *ngFor="let ticket of listproduits;">
+                <td>{{ ticket.id }}</td>
+                <td>{{ ticket.instant }}</td>
+                <td>{{ ticket.userDecision }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <i>{{ message }}</i>
+        </div>
+      </div>
+    </div>
+  </div>  
+
+
+
+  <!--Start Info Approv Modal-->
+  <div class="modal" id="specialInfoApprov">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Info coupon</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <table class="table table-bordered">
+            <thead>
+              <tr class="first_row_table">
+                <th>Produits</th>
+                <th>Quantité</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="row_table" *ngFor="let approv of listproduits; let index=index;">
+                <td>{{ approv.product }}</td>
+                <td>{{ approv.quantity }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="row">
+            <div class="col"> <button class="btn btn-success" (click)="decision('valider', 'superieur')">valider</button> </div>
+            <div class="col"> <button class="btn btn-warning" (click)="decision('rejeter', 'superieur')">rejeter</button> </div>
+            <div class="col"> <button class="btn btn-danger" (click)="decision('annuler', 'superieur')">Annuler</button> </div>
+          </div>
+          <i>{{ message }}</i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!--Start Info Approv with decison Modal-->
+  <div class="modal" id="infoTicketApprovForm">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Info Ticket</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <table class="table table-bordered">
+            <thead>
+              <tr class="first_row_table">
+                <th>Produits</th>
+                <th>Quantité Demandée</th>
+                <th>Quantité Envoyée</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="row_table" *ngFor="let ticket of listproduits; let index=index;">
+                <td>{{ ticket.product }}</td>
+                <td>{{ ticket.initialquantity }}</td>
+                <td>{{ ticket.sendquantity }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="row" *ngIf="display">
+            <div class="col"> <button class="btn btn-success" (click)="decisionTicket('valider')">valider</button> </div>
+            <div class="col"> <button class="btn btn-warning" (click)="decisionTicket('rejeter')">rejeter</button> </div>
+          </div>
+          <i>{{ message }}</i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  
+  <!--Start Create Approv Modal-->
+  <div class="modal" id="createapprovform">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Créer Approv</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+
+          <div class="row mb-1">
+            <div class="col">
+                <select class="form-select" name="product" autocomplete="off" [(ngModel)]="new_produit">
+                    <option *ngFor="let produit of produits" value="{{ produit.name }}">{{ produit.name }}</option>
+                </select>
+            </div>
+            <div class="col"><input class="form-control" type="number" name="quantity" [(ngModel)]="quantity" autocomplete="off"></div>
+            <div class="col"><button class="btn btn-primary" (click)='updateListProd()'><i class="fa fa-check"></i></button></div>
+        </div>
+          
+                <table class="table table-bordered">
+                  <thead>
+                    <tr class="first_row_table">
+                      <th>Nom</th>
+                      <th>Quantité</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="row_table" *ngFor="let produit of listproduits; let index=index;">
+                      <td>{{ produit.product }}</td>
+                      <td>{{ produit.quantity }}</td>
+                      <td>
+                        <i class="fa fa-trash mr-3" (click)="deleteitem(index)"></i>
+                        <i class="fa fa-pencil mr-3" (click)="modification(index)"></i>
+                      </td>
+    
+                    </tr>
+                  </tbody>
+              </table>
+                
+              <div class="row mb-1">
+                  <div class="col">
+                      <button type="button" class="btn btn-primary" (click)="addApprov()"><i class="fa fa-check"></i>Save</button>
+                  </div>
+              </div>
+                
+        </div>
+          
+      </div>
+    </div>
+  </div>
+  <!-- End Create Modal Produit-->
+
+
+  <!--Start Create Modal-->
+  <div class="modal" id="modifapprovform">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Modif Approv</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+
+          <div class="row mb-1">
+            <div class="col">
+                <select class="form-select" name="product" autocomplete="off" [(ngModel)]="new_produit">
+                    <option *ngFor="let produit of produits" value="{{ produit.name }}">{{ produit.name }}</option>
+                </select>
+            </div>
+            <div class="col"><input class="form-control" type="number" name="quantity" [(ngModel)]="quantity" autocomplete="off"></div>
+            <div class="col"><button class="btn btn-primary" (click)='updateitem()'><i class="fa fa-check"></i></button></div>
+        </div>
+          
+                <table class="table table-bordered">
+                  <thead>
+                    <tr class="first_row_table">
+                      <th>Nom</th>
+                      <th>Quantite</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="row_table" *ngFor="let app of listproduits; let index=index;">
+                      <td>{{ app.product }}</td>
+                      <td>{{ app.quantity }}</td>
+                      <td>
+                        <i class="fa fa-trash mr-3" (click)="deleteitem(index)"></i>
+                        <i class="fa fa-pencil mr-3" (click)="modification(index)"></i>
+                      </td>
+                    </tr>
+                  </tbody>
+              </table>
+                
+              <div class="row mb-1">
+                  <div class="col">
+                      <button class="btn btn-primary" (click)="modifApprovs()"><i class="fa fa-check"></i>Save</button>
+                  </div>
+              </div>
+                
+        </div>
+          
+      </div>
+    </div>
+  </div>
+  <!-- End Create Modal Produit-->
+
+
+
+
+
+  <!--Start Livrer produit Modal-->
+  <div class="modal" id="addTicketApprov">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Ticket Approv</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <table class="table table-bordered">
+            <thead>
+              <tr class="first_row_table">
+                <th>Produits</th>
+                <th>Qté en stock</th>
+                <th>Qté Demandée</th>
+                <th>Qté Envoyée</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="row_table1" *ngFor="let app of listproduits; let index=index;">
+                <td>{{ app.product }}</td>
+                <td>{{ app.waitingquantity }}</td>
+                <td>{{ app.quantity }}</td>
+                <td><input (blur)="changeValue(index, 'send')" type="number" class="send_value"></td>
+              </tr>
+            </tbody>
+          </table>
+          <div>
+            <button class="btn btn-primary" (click)="sendCoupon()">Envoyer</button>
+          </div>      
+        </div>
+          
+      </div>
+    </div>
+  </div>
+
+
+   <!--Start Livrer produit Modal-->
+   <div class="modal" id="modifTicket">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Modif Ticket Approv</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <table class="table table-bordered">
+            <thead>
+              <tr class="first_row_table">
+                <th>Produits</th>
+                <th>Qté Restante</th>
+                <th>Qté Envoyée</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="row_table1" *ngFor="let app of listproduits; let index=index;">
+                <td>{{ app.product }}</td>
+                <td>{{ app.initialquantity }}</td>
+                <td><input (blur)="changeValue1(index, 'sendquantity')" value="{{ app.sendquantity }}" type="number" class="send_value1"></td>
+              </tr>
+            </tbody>
+          </table>
+          <div>
+            <button class="btn btn-primary" (click)="sendCoupon1()">Envoyer</button>
+          </div>      
+        </div>
+          
+      </div>
+    </div>
+  </div>
+  
+  

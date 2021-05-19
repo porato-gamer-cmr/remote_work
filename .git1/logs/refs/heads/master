@@ -1,0 +1,7 @@
+0000000000000000000000000000000000000000 0ea8aee21acbfcb3276148c4a6bf79037e87a2ec porato <ngaleusteph@gmail.com> 1617291464 +0100	commit (initial): possilité de créer des compte
+0ea8aee21acbfcb3276148c4a6bf79037e87a2ec f0fa460f85379ed0fdf0d0252ed516533fcdb744 porato <ngaleusteph@gmail.com> 1617291852 +0100	commit: possilité de créer des compte
+f0fa460f85379ed0fdf0d0252ed516533fcdb744 3212de0240e05eaa3c0e2acb3c08c8b9249333e9 porato <ngaleusteph@gmail.com> 1617292059 +0100	commit: i
+3212de0240e05eaa3c0e2acb3c08c8b9249333e9 d9647a73dd2eeba38b19884ee4ff6069e8ea7a5d porato <ngaleusteph@gmail.com> 1617292112 +0100	commit: backend du projet
+d9647a73dd2eeba38b19884ee4ff6069e8ea7a5d 03a807ae7b8f325588ac9d8073948a1243145333 porato <ngaleusteph@gmail.com> 1617894604 +0100	commit: utilisation de localstorage pour conserver le token
+03a807ae7b8f325588ac9d8073948a1243145333 13c5582ea1e6d693e0aea8bf2d2f6c11fb0d1e1f porato <ngaleusteph@gmail.com> 1618244892 +0100	commit: logique des approvs modifier
+13c5582ea1e6d693e0aea8bf2d2f6c11fb0d1e1f 2dfd5bcf081c7da40bb9e0d35b44408a0394259e porato <ngaleusteph@gmail.com> 1621420366 +0100	commit: cryptage du mdp

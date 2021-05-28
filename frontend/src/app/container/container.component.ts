@@ -17,4 +17,9 @@ export class ContainerComponent implements OnInit {
     this.role=data['role'];
   }
 
+  logOut(){
+    window.localStorage.clear()
+    this.route.navigate(['/signin']);
+  }
+
 }

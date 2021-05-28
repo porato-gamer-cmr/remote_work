@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -10,7 +10,6 @@ import { environment } from 'src/environments/environment';
 export class ApprovsService {
 
   p: Boolean;
-  headers = new HttpHeaders().set('Authorization', 'Bearer '+window.localStorage.getItem("token"));
 
   constructor(private httpClient: HttpClient) { }
 
@@ -40,7 +39,7 @@ export class ApprovsService {
   }
 
   listApprovsItems(){
-    this.httpClient.get(environment.url + "listapprovsitems", {'headers':this.headers})
+    this.httpClient.get(environment.url + "listapprovsitems")
       .subscribe(
         (data: any[])=>{
           this.approvsItems = data;
@@ -54,7 +53,7 @@ export class ApprovsService {
   }
 
   listApprovs(){
-    this.httpClient.get(environment.url + "listapprovs", {'headers':this.headers})
+    this.httpClient.get(environment.url + "listapprovs")
       .subscribe(
         (data: any[])=>{
           this.approvs = data;
@@ -69,7 +68,7 @@ export class ApprovsService {
   }
 
   listSpecialApprovs(){
-    this.httpClient.get(environment.url + "specialapprovs", {'headers':this.headers})
+    this.httpClient.get(environment.url + "specialapprovs")
       .subscribe(
         (data: any[])=>{
           this.specialApprovs = data;
@@ -83,7 +82,7 @@ export class ApprovsService {
   }
 
   listInferiorApprovs(){
-    this.httpClient.get(environment.url + "listinferiorapprovs", {'headers':this.headers})
+    this.httpClient.get(environment.url + "listinferiorapprovs")
       .subscribe(
         (data: any[])=>{
           this.inferiorApprovs = data;
@@ -97,7 +96,7 @@ export class ApprovsService {
   }
 
   addApprov(approv){
-    this.httpClient.post<any[]>(environment.url + "addapprov/", approv, {'headers':this.headers})
+    this.httpClient.post<any[]>(environment.url + "addapprov/", approv)
       .subscribe(
         (data)=>{
            this.listApprovs();
@@ -116,7 +115,7 @@ export class ApprovsService {
   deleteApprov(id){
     this.p = confirm("Voulez-vous vraiment supprimer ?");
     if(this.p){
-      this.httpClient.post<any[]>(environment.url + "deleteapprov/", {"id":id}, {'headers':this.headers})
+      this.httpClient.post<any[]>(environment.url + "deleteapprov/", {"id":id})
       .subscribe(
         (data)=>{
           this.listApprovs();
@@ -137,7 +136,7 @@ export class ApprovsService {
   lockApprov(id){
     this.p = confirm("Voulez-vous vraiment fermer ce ticket ?");
     if(this.p){
-      this.httpClient.post<any[]>(environment.url + "lockapprov/", {"id":id}, {'headers':this.headers})
+      this.httpClient.post<any[]>(environment.url + "lockapprov/", {"id":id})
       .subscribe(
         (data)=>{
           this.listApprovs();
@@ -156,7 +155,7 @@ export class ApprovsService {
 
 
   modifApprovs(approv){
-    this.httpClient.post<any[]>(environment.url + "modifapprov/", approv, {'headers':this.headers})
+    this.httpClient.post<any[]>(environment.url + "modifapprov/", approv)
       .subscribe(
         (data)=>{
            this.listApprovs();
@@ -176,7 +175,7 @@ export class ApprovsService {
       message: message,
       role: role
     }
-    this.httpClient.post<any[]>(environment.url + "decisionapprov/", value, {'headers':this.headers})
+    this.httpClient.post<any[]>(environment.url + "decisionapprov/", value)
       .subscribe(
         (data)=>{
            this.listApprovs();
@@ -193,7 +192,7 @@ export class ApprovsService {
 
 
   getApprovStats(){
-    this.httpClient.get<any[]>(environment.url + "approvstats/", {'headers':this.headers})
+    this.httpClient.get<any[]>(environment.url + "approvstats/")
       .subscribe(
         (data)=>{
           this.approvStats = data;

@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { ProduitsService } from '../services/produits.service';
+import { ProduitsService } from '../_services/produits.service';
 declare  var jQuery:  any;
 @Component({
   selector: 'app-produits',

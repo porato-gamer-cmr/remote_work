@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from . import ticket_approv
+from . import test_api
 
 urlpatterns = [
     path('listproduits/', views.listproduits, name='1'),
@@ -28,7 +29,7 @@ urlpatterns = [
     path('modifapprovticket/', ticket_approv.modifTicketApprov, name='21'),
     path('decisionapprovticket/', ticket_approv.decisionTicketApprov, name='22'),
     path('approvstats/', ticket_approv.approvStats, name='27'),
-    path('sendFile/', ticket_approv.saveFile, name='28')
+    path('sendFile/', test_api.saveFile, name='28')
     
 
 ]

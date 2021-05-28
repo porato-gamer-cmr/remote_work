@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, Input, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { JwtHelperService } from '@auth0/angular-jwt';
 import { Router } from '@angular/router';
-import jwt_token from 'jwt-decode';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -12,8 +12,8 @@ import { environment } from 'src/environments/environment';
 })
 export class SigninComponent implements OnInit {
 
-  response;
   isLogging: boolean = true;
+  helper = new JwtHelperService();
   constructor(private httpClient: HttpClient, private route: Router) { }
   ngOnInit(): void {
   }

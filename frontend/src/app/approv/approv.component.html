@@ -54,7 +54,12 @@
           </div>
         </div>
         <!--Personnal approvs-->
-        <div class="row" id="tableau">
+        <div class="row" *ngIf="approvs.length == 0">
+          <div class="col">
+            Aucun élément pour l'instant
+          </div>
+        </div>
+        <div class="row" id="tableau" *ngIf="approvs.length > 0">
           <div class="col">
               <table class="table table-bordered">
                 <thead>
@@ -76,10 +81,10 @@
                     </td>
                     <td> {{ approv.instant }} </td>
                     <td class="non-align">
-                      <i class="fa fa-info mr-3" (click)="infoApprovs(approv.id, 'approv')" data-toggle="modal" data-target="#infoApprov" ></i>
+                      <i class="fa fa-info mr-3" (click)="infoApprovs(approv.id, 'approv')" data-toggle="modal" data-target="#infoApprov" title="info"></i>
                       <i class="fa fa-pencil mr-3" (click)="infoApprovs(approv.id, 'approv')" data-toggle="modal" data-target="#modifapprovform"></i>
                       <i class="fa fa-times-circle mr-3" (click)="lockapprov(approv.id)" *ngIf="approv.higherDecision==1 && approv.infoDecision==1"></i>
-                      <i class="fa fa-trash mr-3" (click)="deleteapprov(approv.id)" *ngIf="(approv.higherDecision==0 && approv.infoDecision==1) || (approv.higherDecision==0 && approv.infoDecision==0)"></i>
+                      <i class="fa fa-trash mr-3" (click)="deleteapprov(approv.id)" *ngIf="(approv.higherDecision==0 && approv.infoDecision==1) || (approv.higherDecision==0 && approv.infoDecision==0) || (approv.higherDecision==1 && approv.infoDecision==0)"></i>
                     </td>
                   </tr>
                 </tbody>
@@ -89,13 +94,18 @@
         <!--End of personnal approvs-->
       </div>
       <div class="tab-pane fade" id="otherApprov" role="tabpanel" aria-labelledby="profile-tab">
-        <div class="row">
+        <div class="row" *ngIf="otherApprovs.length > 0">
           <div class="col">
             <input class="input_search" placeholder="search" name="search" [(ngModel)]="e" autocomplete="off">
           </div>
         </div>
+        <div class="row" *ngIf="otherApprovs.length == 0">
+          <div class="col">
+            Aucun élément pour l'instant
+          </div>
+        </div>
         <!--Other approvs-->
-        <div class="row" id="tableau">
+        <div class="row" id="tableau" *ngIf="otherApprovs.length > 0">
           <div class="col">
             <table class="table table-bordered">
               <thead>
@@ -123,12 +133,17 @@
       </div>
 
       <div class="tab-pane fade" id="rmgApprov" role="tabpanel" aria-labelledby="contact-tab">
-        <div class="row">
+        <div class="row" *ngIf="specialApprovs.length > 0">
           <div class="col">
             <input class="input_search" placeholder="search" name="search" autocomplete="off">
           </div>
         </div>
-        <!--Spécila Approvs-->
+        <!--Spécial Approvs-->
+        <div class="row" *ngIf="specialApprovs.length == 0">
+          <div class="col">
+            Aucun élément pour l'instant
+          </div>
+        </div>
         <div class="row" id="tableau">
           <div class="col">
             <table class="table table-bordered">
@@ -165,7 +180,12 @@
           </div>
         </div>
         <!--Personnalticket approvs-->
-        <div class="row" id="tableau">
+        <div class="row" *ngIf="personnalTicketApprovs.length == 0">
+          <div class="col">
+            Aucun élément pour l'instant
+          </div>
+        </div>
+        <div class="row" id="tableau" *ngIf="personnalTicketApprovs.length > 0">
           <div class="col">
               <table class="table table-bordered">
                   <thead>
@@ -204,7 +224,12 @@
           </div>
         </div>
         <!--ticket approvs-->
-        <div class="row" id="tableau">
+        <div class="row" *ngIf="ticketApprovs.length == 0">
+          <div class="col">
+            Aucun élément pour l'instant
+          </div>
+        </div>
+        <div class="row" id="tableau" *ngIf="ticketApprovs.length > 0">
           <div class="col">
             <table class="table table-bordered">
                 <thead>

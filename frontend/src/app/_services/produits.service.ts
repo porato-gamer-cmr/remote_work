@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -8,7 +8,6 @@ import { environment } from 'src/environments/environment';
 })
 export class ProduitsService {
   p: Boolean;
-  headers = new HttpHeaders().set('Authorization', 'Bearer '+window.localStorage.getItem("token"));
 
   constructor(private httpClient: HttpClient) { }
 
@@ -22,7 +21,7 @@ export class ProduitsService {
   }
 
   listProduits(){
-    this.httpClient.get(environment.url + "listproduits", {'headers':this.headers})
+    this.httpClient.get(environment.url + "listproduits")
       .subscribe(
         (data: any[])=>{
           this.produits = data;
@@ -36,11 +35,11 @@ export class ProduitsService {
   }
 
   addProduit(produits){
-    this.httpClient.post<any[]>(environment.url + "addproduit/", produits, {'headers':this.headers})
+    this.httpClient.post<any[]>(environment.url + "addproduit/", produits)
       .subscribe(
         (data)=>{
           this.listProduits();
-          console.log("Réussite lors de l ajout de produit");
+          console.log("Réussite lors de l ajout de produit" + data["message"]);
         },
         (error)=>{
           console.log("Erreur lors de l ajout de produit");
@@ -49,7 +48,7 @@ export class ProduitsService {
   }
 
   updateProduit(produit){
-    this.httpClient.post<any[]>(environment.url + "updateproduit/", produit, {'headers':this.headers})
+    this.httpClient.post<any[]>(environment.url + "updateproduit/", produit)
       .subscribe(
         (data)=>{
           this.listProduits();
@@ -64,7 +63,7 @@ export class ProduitsService {
   deleteProduit(id){
     this.p = confirm("Voulez-vous vraiment supprimer ?");
     if(this.p){
-      this.httpClient.post<any[]>(environment.url + "deleteproduit/",{index: id}, {'headers':this.headers})
+      this.httpClient.post<any[]>(environment.url + "deleteproduit/",{index: id})
         .subscribe(
           (data)=>{
             this.listProduits();

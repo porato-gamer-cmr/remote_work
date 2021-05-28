@@ -1,18 +1,17 @@
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render
+from django.http import JsonResponse
 from .models import Product, Approv, ApprovItem, User 
 from django.views.decorators.csrf import csrf_exempt
 import json
-from django.core.serializers import serialize
 import jwt
 from datetime import datetime, timedelta
 import bcrypt
+#from django.contrib.auth.models import User
 # Create your views here.
 
 
 JWT_SECRET = 'secret'
 JWT_ALGORITHM = 'HS256'
-JWT_EXP_DELTA_SECONDS = 5000
+JWT_EXP_DELTA_SECONDS = 50000
 
 @csrf_exempt
 def listproduits(request):
@@ -29,7 +28,8 @@ def addproduit(request):
         product = json.loads(my_json)
         payload = tokenVerification(request.headers['Authorization'].split(' ')[1])
         Product.objects.create( name=product['name'], quantity=product['quantity'], security=product['security'], warning=product['warning'], type=product["type"], waitingquantity=product['quantity'])
-    return JsonResponse({'message': 'Enregistrement reussi' }) 
+    #return JsonResponse({'message': 'Enregistrement reussi' })
+    return JsonResponse({'message': request.protocol }) 
 
 @csrf_exempt
 def updateproduit(request):
@@ -124,54 +124,23 @@ def addapprov(request):
 
 @csrf_exempt
 def listapprovsitems(request):
-    payload = tokenVerification(request.headers['Authorization'].split(' ')[1])
+    #payload = tokenVerification(request.headers['Authorization'].split(' ')[1])
     approvsItem = ApprovItem.objects.all()
-    approvs=[]
-    for a in approvsItem:
-        app={
-            "id": a.pk,
-            "product": a.product.name,
-            "quantity": a.quantity,
-            "approv": a.approv.pk
-            }
-        approvs.append(app)
-    return JsonResponse(approvs,  safe=False)
+    return JsonResponse([app.serializable() for app in approvsItem],  safe=False)
 
 
 @csrf_exempt
 def listapprovs(request):
     payload = tokenVerification(request.headers['Authorization'].split(' ')[1])
     approv = Approv.objects.filter(user__id=payload['user_id'] , state= False)
-    approvs=[]
-    for a in approv:
-        app={
-            "id": a.pk,
-            "user": a.user.name,
-            "instant": str(a.instant.strftime("%x"))+" à "+str(a.instant.strftime("%X")),
-            "higherDecision": a.higherDecision,
-            "infoDecision": a.infoDecision,
-            "message": a.message
-            }
-        approvs.append(app)
-    return JsonResponse(approvs, safe=False)
+    return JsonResponse([app.serializable() for app in approv],  safe=False)
 
 
 @csrf_exempt
 def listinferiorapprovs(request):
     payload = tokenVerification(request.headers['Authorization'].split(' ')[1])
     approv = Approv.objects.filter(user__higher__id=payload['user_id'], state=False)
-    approvs=[]
-    for a in approv:
-        app={
-            "id": a.pk,
-            "user": a.user.name,
-            "instant": str(a.instant.strftime("%x"))+" à "+str(a.instant.strftime("%X")),
-            "higherDecision": a.higherDecision,
-            "infoDecision": a.infoDecision,
-            "message": a.message
-            }
-        approvs.append(app)
-    return JsonResponse(approvs, content_type="application/json", safe=False)
+    return JsonResponse([app.serializable() for app in approv],  safe=False)
        
 
 
@@ -222,18 +191,7 @@ def decisionapprovs(request):
 @csrf_exempt
 def listuser(request):
     users=User.objects.all()
-    us=[]
-    for a in users:
-        app={
-            "id": a.pk,
-            "name": a.name,
-            "email": a.email,
-            "password": a.password,
-            "role": a.role
-            }
-        print(app)
-        us.append(app)
-    return JsonResponse(us, content_type="application/json", safe=False) 
+    return JsonResponse([user.serializable() for user in users],  safe=False) 
 
 
 @csrf_exempt
@@ -260,6 +218,7 @@ def login(request):
     req = request.body
     my_json = req.decode('utf8')
     data = json.loads(my_json)
+    #user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
 
     try:
         user = User.objects.get(email=data['courriel'])
@@ -288,15 +247,4 @@ def specialapprovs(request):
         approvs=Approv.objects.filter(higherDecision=1).exclude(infoDecision=1)
     else:
         approvs=[]
-    specialApprovs=[]
-    for a in approvs:
-        app={
-            "id": a.pk,
-            "user": a.user.name,
-            "instant": str(a.instant.strftime("%x"))+" à "+str(a.instant.strftime("%X")),
-            "higherDecision": a.higherDecision,
-            "infoDecision": a.infoDecision,
-            "message": a.message
-            }
-        specialApprovs.append(app)
-    return JsonResponse(specialApprovs, content_type="application/json", safe=False)
+    return JsonResponse([app.serializable() for app in approvs],  safe=False)

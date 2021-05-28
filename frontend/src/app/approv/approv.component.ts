@@ -2,10 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { Component, Input, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Subject, Subscription } from 'rxjs';
-import { ApprovsService } from '../services/approvs.service';
-import { ProduitsService } from '../services/produits.service';
+import { ApprovsService } from '../_services/approvs.service';
+import { ProduitsService } from '../_services/produits.service';
 import { Router } from '@angular/router';
-import { TicketApprovService } from '../services/ticket-approv.service';
+import { TicketApprovService } from '../_services/ticket-approv.service';
 import jwt_token from 'jwt-decode';
 import { environment } from 'src/environments/environment';
 declare  var jQuery:  any;
@@ -22,12 +22,11 @@ export class ApprovComponent implements OnInit {
   @Input() personnalTicketApprovs=[];
   @Input() ticketApprovsItems=[];
   
-  @Input() d;
   @Input() approvs=[];
   @Input() otherApprovs=[];
   @Input() specialApprovs=[];
   @Input() id;
-  @Input() approvStats;
+  @Input() approvStats:any;
 
   @Input() allApprovsItems =[];
   @Input() new_produit;
@@ -35,9 +34,9 @@ export class ApprovComponent implements OnInit {
   @Input() produits=[];
   @Input() e;
   @Input() message;
-  p: boolean;
   listproduits=[];
   listproduitsSubject = new Subject<any[]>();
+  produitsSubscription = new Subscription;
   approvsItemsSubscription = new Subscription;
   approvsSubscription: Subscription;
   listproduitsSubscription: Subscription;
@@ -49,24 +48,11 @@ export class ApprovComponent implements OnInit {
   ticketApprovsItemsSubscription = new Subscription;
   ticketApprovsSubscription: Subscription;
   role=jwt_token(window.localStorage.getItem("token"));
-  testing = new Array();
 
 
   constructor(private route: Router, private approvsService: ApprovsService, private produitsService: ProduitsService, private httpClient: HttpClient, private ticketApprovsService: TicketApprovService) { }
   ngOnInit(): void {
-    this.role = this.role['role'];
-    //this.produitsService.listProduits();
-    //this.produitsService.produits);
-    this.httpClient.get(environment.url + "listproduits")
-      .subscribe(
-        (data: any[])=>{
-          this.produits = data;
-          console.log("reussite lors de la récuperation des produits");
-        },
-        (error)=>{
-          console.log("probleme lors de la récuperation des produits" + error);
-        }
-      ); 
+    this.role = this.role['role'];    
     this.ticketApprovsService.listPersonnalTicketApprovs();
     this.ticketApprovsService.listTicketApprovs();
     this.ticketApprovsService.listTicketApprovsItems();
@@ -75,6 +61,10 @@ export class ApprovComponent implements OnInit {
     this.approvsService.listApprovsItems();
     this.approvsService.listSpecialApprovs();
     this.approvsService.getApprovStats();
+    this.produitsService.listProduits();
+    this.produitsSubscription = this.produitsService.produitsSubject.subscribe(
+      (data)=>{this.produits = data;}
+    )
     this.approvStatsSubscription = this.approvsService.approvstatsSubject.subscribe(
       (data)=>{this.approvStats = data;}
     )
@@ -241,7 +231,6 @@ export class ApprovComponent implements OnInit {
         };
       }
       this.listproduits = liste;
-      //this.listproduits = liste.map(this.transform)
     }
     else{
       this.listproduits = this.allApprovsItems.filter(approv=>approv.approv==id);
@@ -256,15 +245,6 @@ export class ApprovComponent implements OnInit {
 
   listTicketApprov(id){
     this.listproduits = this.ticketApprovs.filter(ticket=>ticket.approv==id);
-  }
-
-  transform(approvItem){ 
-    return {
-      approv: approvItem.approv,
-      product: approvItem.product,
-      quantity: approvItem.quantity,
-      send: 0
-    }
   }
 
   decision(property, role){

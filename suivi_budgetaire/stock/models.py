@@ -30,8 +30,7 @@ class User(models.Model):
     role = models.CharField(max_length=200)
 
     def serializable(self):
-        return
-        {
+        return {
             "id": self.pk,
             "email": self.email,
             "name": self.name,
@@ -49,8 +48,7 @@ class Approv(models.Model):
     state = models.BooleanField(default=False)
 
     def serializable(self):
-        return
-        {
+        return {
             "id": self.pk,
             "user": self.user.name,
             "instant": self.instant,
@@ -66,16 +64,15 @@ class ApprovItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     approv = models.ForeignKey(Approv, on_delete=models.CASCADE)
-    #total of send items
     sendquantity = models.IntegerField(default=0)
 
     def serializable(self):
-        return
-        {
+        return {
             "id": self.pk,
             "product": self.product.name,
             "quantity": self.quantity,
-            "approv": self.approv.pk
+            "approv": self.approv.pk,
+            "sendquantity": self.sendquantity
         }
 
 
@@ -85,6 +82,16 @@ class TicketApprov(models.Model):
     instant = models.DateTimeField(auto_now_add=True)
     message = models.CharField(max_length=200)
 
+    def serializable(self):
+        return {
+            "id": self.pk,
+            "approv": self.approv.pk,
+            "instant": str(self.instant.strftime("%x"))+" à "+str(self.instant.strftime("%X")),
+            "userDecision": self.userDecision,
+            "message": self.message,
+            "user" : self.approv.user.name
+        }
+
 
 
 class TicketApprovItem(models.Model):
@@ -93,6 +100,15 @@ class TicketApprovItem(models.Model):
     sendquantity = models.IntegerField()
     ticketapprov = models.ForeignKey(TicketApprov, on_delete=models.CASCADE)
 
+    def serializable(self):
+        return {
+            "id": self.pk,
+            "ticketapprov": self.ticketapprov.pk,
+            "product": self.product,
+            "initialquantity": self.initialquantity,
+            "sendquantity": self.sendquantity
+        }
+
 #Log model user, date and action 
 class Log(models.Model):
     user=models.CharField(max_length=200)
@@ -100,5 +116,5 @@ class Log(models.Model):
 
 #model for file upload 
 class UploadFile(models.Model):
-    title = models.TextField()
-    cover = models.ImageField(upload_to='images/')
+    title = models.TextField(default="texte par defaut")
+    cover = models.ImageField(upload_to='images/', null=True, blank=True)

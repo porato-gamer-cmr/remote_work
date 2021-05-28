@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -7,8 +7,6 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class TicketApprovService {
-
-  headers = new HttpHeaders().set('Authorization', 'Bearer '+window.localStorage.getItem("token"));
 
   constructor(private httpClient: HttpClient) { }
 
@@ -32,7 +30,7 @@ export class TicketApprovService {
   
 
   listTicketApprovsItems(){
-    this.httpClient.get(environment.url + "listapprovsticketitems", {'headers':this.headers})
+    this.httpClient.get(environment.url + "listapprovsticketitems")
       .subscribe(
         (data: any[])=>{
           this.ticketApprovsItems = data;
@@ -46,7 +44,7 @@ export class TicketApprovService {
   }
 
   listTicketApprovs(){
-    this.httpClient.get(environment.url + "listapprovsticket", {'headers':this.headers})
+    this.httpClient.get(environment.url + "listapprovsticket")
       .subscribe(
         (data: any[])=>{
           this.ticketApprovs = data;
@@ -61,7 +59,7 @@ export class TicketApprovService {
   }
 
   listPersonnalTicketApprovs(){
-    this.httpClient.get(environment.url + "personnalapprovsticket", {'headers':this.headers})
+    this.httpClient.get(environment.url + "personnalapprovsticket")
       .subscribe(
         (data: any[])=>{
           this.personnalTicketApprovs = data;
@@ -75,7 +73,7 @@ export class TicketApprovService {
   }
 
   addApprovTicket(approv){
-    this.httpClient.post<any[]>(environment.url + "addapprovticket/", approv, {'headers':this.headers})
+    this.httpClient.post<any[]>(environment.url + "addapprovticket/", approv)
       .subscribe(
         (data)=>{
            this.listTicketApprovs();
@@ -90,7 +88,7 @@ export class TicketApprovService {
   }
 
   deleteApprovTicket(id){
-    this.httpClient.post<any[]>(environment.url + "deleteapprovticket/", {"id":id}, {'headers':this.headers})
+    this.httpClient.post<any[]>(environment.url + "deleteapprovticket/", {"id":id})
       .subscribe(
         (data)=>{
           this.listTicketApprovs();
@@ -106,7 +104,7 @@ export class TicketApprovService {
 
 
   modifTicketApprovs(approv){
-    this.httpClient.post<any[]>(environment.url + "modifapprovticket/", approv, {'headers':this.headers})
+    this.httpClient.post<any[]>(environment.url + "modifapprovticket/", approv)
       .subscribe(
         (data)=>{
           this.listTicketApprovs();
@@ -126,7 +124,7 @@ export class TicketApprovService {
       id: id, 
       message: message
     }
-    this.httpClient.post<any[]>(environment.url + "decisionapprovticket/", value, {'headers':this.headers})
+    this.httpClient.post<any[]>(environment.url + "decisionapprovticket/", value)
       .subscribe(
         (data)=>{
           this.listPersonnalTicketApprovs();

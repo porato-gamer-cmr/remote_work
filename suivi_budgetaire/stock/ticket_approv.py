@@ -1,6 +1,6 @@
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import render
-from .models import TicketApprov, TicketApprovItem, Approv, Product, User
+from .models import TicketApprov, TicketApprovItem, Approv, Product, User, UploadFile
 from django.db.models import F
 import json
 from django.views.decorators.csrf import csrf_exempt
@@ -50,34 +50,14 @@ def sendingMail(receiver, name):
 def listTicketApprovs(request):
     payload = tokenVerification(request.headers['Authorization'].split(' ')[1])
     ticketApprovs = TicketApprov.objects.all()
-    ticket=[]
-    for a in ticketApprovs:
-        app={
-            "id": a.pk,
-            "approv": a.approv.pk,
-            "instant": str(a.instant.strftime("%x"))+" à "+str(a.instant.strftime("%X")),
-            "userDecision": a.userDecision,
-            "message": a.message,
-            "user" : a.approv.user.name
-            }
-        ticket.append(app)
-    return JsonResponse(ticket, safe=False)
+    return JsonResponse([ticket.serializable() for ticket in ticketApprovs],  safe=False)
 
 
 @csrf_exempt
 def listPersonnalTicketApprovs(request):
     payload = tokenVerification(request.headers['Authorization'].split(' ')[1])
     ticketApprovs = TicketApprov.objects.filter(approv__user__id=payload['user_id'])
-    ticket=[]
-    for a in ticketApprovs:
-        app={
-            "id": a.pk,
-            "instant": str(a.instant.strftime("%x"))+" à "+str(a.instant.strftime("%X")),
-            "userDecision": a.userDecision,
-            "message": a.message
-            }
-        ticket.append(app)
-    return JsonResponse(ticket, safe=False)
+    return JsonResponse([ticket.serializable() for ticket in ticketApprovs],  safe=False)
 
 
 
@@ -85,17 +65,7 @@ def listPersonnalTicketApprovs(request):
 def listTicketApprovsItem(request):
     payload = tokenVerification(request.headers['Authorization'].split(' ')[1])
     ticketApprovsItem = TicketApprovItem.objects.all()
-    ticket=[]
-    for a in ticketApprovsItem:
-        app={
-            "id": a.pk,
-            "ticketapprov": a.ticketapprov.pk,
-            "product": a.product,
-            "initialquantity": a.initialquantity,
-            "sendquantity": a.sendquantity
-            }
-        ticket.append(app)
-    return JsonResponse(ticket, safe=False)
+    return JsonResponse([ticket.serializable() for ticket in ticketApprovsItem],  safe=False)
 
 
 @csrf_exempt
@@ -109,13 +79,13 @@ def addTicketApprovs(request):
     payload = tokenVerification(request.headers['Authorization'].split(' ')[1])
     ticketApprov = TicketApprov.objects.create(approv=Approv.objects.get( id=(json.loads(app[0]))["approv"] ), message="")
     ticketApprov.save()
-    """for item in app:
-        if (item['send'] >  Product.objects.filter(name=item['product']).waitingquantity ):
-            return JsonResponse({'message': 'Le ticket ne peut etre créé car certains produits ne sont pas suffissant en stock'})"""
     for item in app:
         item=json.loads(item)
-        TicketApprovItem.objects.create(product=item['product'], sendquantity=item['send'], initialquantity=item['quantity'], ticketapprov=ticketApprov)
-        Product.objects.filter(name=item['product']).update(waitingquantity=F('waitingquantity')-item['send'])
+        if (item['send'] >  Product.objects.filter(name=item['product']).waitingquantity ):
+            return JsonResponse({'message': 'Le ticket ne peut etre créé car certains produits ne sont pas suffissant en stock'})
+        else:
+            TicketApprovItem.objects.create(product=item['product'], sendquantity=item['send'], initialquantity=item['quantity'], ticketapprov=ticketApprov)
+            Product.objects.filter(name=item['product']).update(waitingquantity=F('waitingquantity')-item['send'])
     data=Approv.objects.get( id=(json.loads(app[0]) )["approv"] )
     sendingMail(data.user.email, data.user.name)
     return JsonResponse({})
@@ -150,15 +120,7 @@ def deleteTicketApprov(request):
     return JsonResponse({"message": "well done"})
 
 
-@csrf_exempt
-def saveFile(request):
-    req = request.body
-    print(request.FILES)
-    print(request.POST)
-    print(request.body)
 
-
-    return JsonResponse({})
 
 
 

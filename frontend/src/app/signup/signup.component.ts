@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, Input, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ApprovsService } from '../services/approvs.service';
+import { ApprovsService } from '../_services/approvs.service';
 import { Subject, Subscription } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { error } from 'selenium-webdriver';

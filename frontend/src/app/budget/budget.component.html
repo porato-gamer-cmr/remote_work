@@ -1,0 +1,43 @@
+<app-container></app-container>
+
+
+<div class="card">
+    <div class="row">
+        <div class="col">
+            <button class="btn btn-success" data-toggle="modal" data-target="#posteBudget"  title="new"><i class="fa fa-user-plus"></i></button>
+            <button class="btn btn-success" data-toggle="modal" data-target="#"><i class="fa fa-upload"></i></button>
+            <button class="btn btn-success"><i class="fa fa-download"></i></button>
+        </div>
+    </div>
+
+    <div class="modal" id="posteBudget">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Nouveau poste budgetaire</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form (ngSubmit)='newPost(new)' #new='ngForm'>
+                <div class="row mb-1">
+                    <div class="col col-4">Nom</div>
+                    <div class="col"><input type="text" name="name" class="form-control border-secondary" ngModel autocomplete="off"></div>
+                  </div>
+                  <div class="row mb-1">
+                    <div class="col col-4">Type</div>
+                    <div class="col">
+                      <select class="form-select" name="type_budget" autocomplete="off" ngModel>
+                        <option value="investissement">Investissement</option>
+                        <option value="fonctionneemnt"> Fonctionnement</option>
+                      </select>
+                    </div>
+                  </div>
+                  <br><br><button type="button" class="btn btn-primary" type="submit">OK</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+</div>

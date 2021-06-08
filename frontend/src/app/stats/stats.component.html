@@ -1,6 +1,10 @@
 <app-container></app-container>
-
-<input name="fichier" type="file" (change)="test($event)">
+    <div *ngFor="let fruit of fruits">
+    <button class="accordion">{{ fruits[0] }}</button>
+    <div class="panel">
+    <p>{{ fruits }}...</p>
+    </div>
+</div>
 
 
 

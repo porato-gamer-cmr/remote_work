@@ -8,18 +8,30 @@ import { NgForm } from '@angular/forms';
   styleUrls: ['./stats.component.css']
 })
 export class StatsComponent implements OnInit {
+  acc = document.getElementsByClassName("accordion");
+  fruits = ['banane', 'orange', 'mandarine', 'papaye'];
 
   constructor(private http: HttpClient) { }
-  ngOnInit() { }
+  ngOnInit() { 
+    for (let i = 0; i < this.acc.length; i++) {
+      this.acc[i].addEventListener("click", function() {
+        /* Toggle between adding and removing the "active" class,
+        to highlight the button that controls the panel */
+        this.classList.toggle("active");
+  
+        /* Toggle between hiding and showing the active panel */
+        var panel = this.nextElementSibling;
+        if (panel.style.display === "block") {
+          panel.style.display = "none";
+        } else {
+          panel.style.display = "block";
+        }
+      });
+  }
 
 
-  test(event){
-      const thingData = new FormData();
-      thingData.append("Soprano", "MaitrGims")
-      thingData.append('image', event.target.files[0], "imageDePlus");
-      this.http.post<any[]>('http://172.16.16.195:8000/stock/sendFile/', thingData).subscribe( (response) => {} );
-      //this.http.post<any[]>('http://172.16.16.195:8000/stock/sendFile/', {'thingData': event.target.files[0]}).subscribe( (response) => {} );
-       
+
+  
   }
 
 

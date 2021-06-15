@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import render
-from .models import TicketApprov, TicketApprovItem, Approv, Product, User, UploadFile
+from .models import TicketApprov, TicketApprovItem, Approv, Product, LigneBudget, PosteBudget
 from django.db.models import F
 import json
 from django.views.decorators.csrf import csrf_exempt
@@ -12,6 +12,81 @@ from .views import tokenVerification
 JWT_SECRET = 'secret'
 JWT_ALGORITHM = 'HS256'
 JWT_EXP_DELTA_SECONDS = 50000
+
+
+def sumAmount(param):
+    b = 0
+    for item in param:
+        b = b + item['amount']
+        #b=b+item
+    return b
+
+
+@csrf_exempt
+def newPoste(request):
+    req = request.body
+    my_json = req.decode('utf8').replace("'", '"')
+    my_json = json.loads(my_json)
+    poste = PosteBudget.objects.create(name = my_json['name'], type = my_json['type'], year = my_json['year'])
+    for item in my_json['ligne']:
+        LigneBudget.objects.create(name = item['name'], amount = item['amount'], posteBudget = poste)
+    return JsonResponse({})
+
+
+@csrf_exempt
+def editPoste(request):
+    req = request.body
+    my_json = req.decode('utf8').replace("'", '"')
+    my_json = json.loads(my_json)
+    print(my_json)
+    poste = PosteBudget.objects.get(pk = my_json['id'])
+    LigneBudget.objects.filter(posteBudget=my_json['id']).delete()
+    for item in my_json['ligne']:
+        LigneBudget.objects.create(name = item['name'], amount = item['amount'], posteBudget = poste)
+    return JsonResponse({})
+
+
+@csrf_exempt
+def listePosteFonctionnement(request):
+    poste=[]
+    for pst in PosteBudget.objects.filter(type="fonctionnement"):
+        ligne = [elt.serializable() for elt in LigneBudget.objects.filter(posteBudget__id=pst.pk)]
+        poste.append({
+            "id": pst.pk,
+            "name": pst.name,
+            "type": pst.type,
+            "year": pst.year,
+            "amount": sumAmount(ligne)
+        })
+    #return JsonResponse([poste.serializable() for poste in PosteBudget.objects.filter(type="fonctionnement")], safe=False)
+    return JsonResponse(poste, safe=False)
+
+
+@csrf_exempt
+def listePosteInvestissement(request):
+    poste=[]
+    for pst in PosteBudget.objects.filter(type="investissement"):
+        ligne = [elt.serializable() for elt in LigneBudget.objects.filter(posteBudget__id=pst.pk)]
+        poste.append({
+            "id": pst.pk,
+            "name": pst.name,
+            "type": pst.type,
+            "year": pst.year,
+            "amount": sumAmount(ligne)
+        })
+    #return JsonResponse([poste.serializable() for poste in PosteBudget.objects.filter(type="investissement")], safe=False)
+    return JsonResponse(poste, safe=False)
+
+
+@csrf_exempt
+def listeLigneFonctionnement(request):
+    return JsonResponse([poste.serializable() for poste in LigneBudget.objects.filter(posteBudget__type="fonctionnement")], safe=False)
+
+
+@csrf_exempt
+def listeLigneInvestissement(request):
+    return JsonResponse([ligne.serializable() for ligne in LigneBudget.objects.filter(posteBudget__type="investissement")], safe=False)
+
 
 
 @csrf_exempt
@@ -100,7 +175,6 @@ def modifTicketApprov(request):
     my_json = my_json.replace("]", "")
     app = my_json.split(";")
     payload = tokenVerification(request.headers['Authorization'].split(' ')[1])
-    #TicketApprovItem.objects.filter(ticketapprov=(json.loads(app[0]))['ticketapprov']).delete()
     ticketApprov = TicketApprov.objects.get(id=(json.loads(app[0]))['ticketapprov'])
     for item in app:
         item = json.loads(item)

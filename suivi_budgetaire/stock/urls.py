@@ -1,4 +1,5 @@
 from django.urls import path
+#from .API import views
 from . import views
 from . import ticket_approv
 from . import test_api
@@ -29,7 +30,15 @@ urlpatterns = [
     path('modifapprovticket/', ticket_approv.modifTicketApprov, name='21'),
     path('decisionapprovticket/', ticket_approv.decisionTicketApprov, name='22'),
     path('approvstats/', ticket_approv.approvStats, name='27'),
-    path('sendFile/', test_api.saveFile, name='28')
+    path('sendFile/', test_api.saveFile, name='28'),
+    #budget
+    path('newPoste/', ticket_approv.newPoste, name='29'),
+    path('editPoste/', ticket_approv.editPoste, name='30'),
+    path('allPosteFonctionnement/', ticket_approv.listePosteFonctionnement, name='31'),
+    path('allLigneFonctionnement/', ticket_approv.listeLigneFonctionnement, name='32'),
+    path('allPosteInvestissement/', ticket_approv.listePosteInvestissement, name='33'),
+    path('allLigneInvestissement/', ticket_approv.listeLigneInvestissement, name='34')
+    
     
 
 ]

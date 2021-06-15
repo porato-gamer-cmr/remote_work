@@ -1,43 +1,194 @@
 <app-container></app-container>
 
+<input list="dataLists">
+<datalist id="dataLists">
+  <option *ngFor="let opt of optionValue" value="opt">{{ opt }}</option>
+</datalist>
 
-<div class="card">
-    <div class="row">
-        <div class="col">
-            <button class="btn btn-success" data-toggle="modal" data-target="#posteBudget"  title="new"><i class="fa fa-user-plus"></i></button>
+<div class="row">
+  <div class="col">
+    <ul class="nav nav-tabs" id="mytab" role="tablist">
+      <li class="nav-item" (click)="changeTypeDeFrais('fonctionnement')">
+        <a class="nav-link active" data-toggle="tab" href="#generaux" role="tab" aria-controls="generaux" aria-selected="true">Frais géneraux</a>
+      </li>
+      <li class="nav-item" (click)="changeTypeDeFrais('investissement')">
+        <a class="nav-link" data-toggle="tab" href="#investissement" role="tab" aria-controls="investissement" aria-selected="true">Frais investissements</a>
+      </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+      <div class="tab-pane fade show active" id="generaux" role="tabpanel">
+        <!--Frais generaux content-->
+        <div class="row">
+          <div class="col">
+            <button class="btn btn-success" data-toggle="modal" data-target="#nouveauPosteBudget"  title="new" (click)="reset()"><i class="fa fa-user-plus"></i></button>
             <button class="btn btn-success" data-toggle="modal" data-target="#"><i class="fa fa-upload"></i></button>
             <button class="btn btn-success"><i class="fa fa-download"></i></button>
+          </div>
+          <div class="col">
+            <select class="form-select bg-white" [(ngModel)]="year0" (change)="refreshPoste('fonctionnement')">
+              <option  *ngFor="let year of yearTab" value="{{ year }}">{{ year }}</option>
+            </select>
+          </div>
+          <div class="col">
+            <input class="input_search" placeholder="search" >
+          </div>
         </div>
-    </div>
-
-    <div class="modal" id="posteBudget">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Nouveau poste budgetaire</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <form (ngSubmit)='newPost(new)' #new='ngForm'>
-                <div class="row mb-1">
-                    <div class="col col-4">Nom</div>
-                    <div class="col"><input type="text" name="name" class="form-control border-secondary" ngModel autocomplete="off"></div>
-                  </div>
-                  <div class="row mb-1">
-                    <div class="col col-4">Type</div>
-                    <div class="col">
-                      <select class="form-select" name="type_budget" autocomplete="off" ngModel>
-                        <option value="investissement">Investissement</option>
-                        <option value="fonctionneemnt"> Fonctionnement</option>
-                      </select>
-                    </div>
-                  </div>
-                  <br><br><button type="button" class="btn btn-primary" type="submit">OK</button>
-              </form>
+        <div class="row">
+          <div class="col">
+            <div *ngFor="let poste of posteFraisFonctionnement_year; let index = index;">
+              <div (click)="updateVisibility(index)" class="item"><b>{{ poste.name }} -- {{ poste.amount }} <i class="fa fa-pencil" data-toggle="modal" data-target="#editPosteBudget" style="float: right;" (click)="updateData(poste)"></i></b></div>
+              <div [hidden]="part0 != index" class="item1">
+                <div *ngFor="let ligne of tableauLigneBudget">{{ ligne.name }} {{ ligne.amount }}</div>
+              </div>
             </div>
           </div>
         </div>
+        <!-- End frais generaux content-->
       </div>
+      <div class="tab-pane " id="investissement" role="tabpanel">
+        <!--Frais investissement content-->
+        <div class="row">
+          <div class="col">
+            <button class="btn btn-success" data-toggle="modal" data-target="#nouveauPosteBudget" title="new" (click)="reset()"><i class="fa fa-user-plus"></i></button>
+            <button class="btn btn-success" data-toggle="modal" data-target="#"><i class="fa fa-upload"></i></button>
+            <button class="btn btn-success"><i class="fa fa-download"></i></button>
+          </div>
+          <div class="col">
+            <select class="form-select bg-white" [(ngModel)]="year1" (change)="refreshPoste('investissement')">
+              <option  *ngFor="let year of yearTab" value="{{ year }}">{{ year }}</option>
+            </select>
+          </div>
+          <div class="col">
+            <input class="input_search" placeholder="search" >
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <!-- <div *ngFor="let poste of posteFraisInvestissement_year; let index = index;">
+              <div (click)="updateVisibility(index)" class="item">
+                <b>{{ poste.name }} {{ poste.type }} {{ poste.year }} -- {{ poste.amount }}</b>
+                <i class="fa fa-pencil" data-toggle="modal" data-target="#editPosteBudget" style="float: right;" (click)="updateData(poste)"></i></div>
+              <div [hidden]="part1 != index" class="item1">
+                <div *ngFor="let ligne of tableauLigneBudget">{{ ligne.name }} {{ ligne.amount }}</div>
+              </div>
+            </div> -->
+
+            <table class="table" *ngFor="let poste of posteFraisInvestissement_year; let index = index;">
+              <tr (click)="updateVisibility(index)" style="background-color:#b8b8b8;">{{ poste.name }} -- {{ poste.amount }} <i class="fa fa-pencil" data-toggle="modal" data-target="#editPosteBudget" style="float: right;" (click)="updateData(poste)"></i></tr>
+              <tr [hidden]="part1 != index" *ngFor="let ligne of tableauLigneBudget" style="background-color: snow;">{{ ligne.name }} {{ ligne.amount }}</tr>
+            </table>
+          </div>
+        </div>
+        <!-- End frais investissement content-->
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+
+<!--You can find all displayed modal of this page bellow-->
+
+<!--Creer un nouveau poste budgetaire-->
+<div class="modal" id="nouveauPosteBudget">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nouveau poste budgetaire</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)='nouveauPoste(new)' #new='ngForm'>
+          <div class="row mb-1">
+              <div class="col col-4">Nom</div>
+              <div class="col">
+                <input type="text" name="name" class="form-control border-secondary" ngModel autocomplete="off" list="data">
+                <datalist id="data">
+                  <option *ngFor="let item of dataSmart" [value]="item">{{item}}</option>
+                </datalist>
+              </div>
+            </div>
+            <div class="row ml-0">
+              <div class="col "><input class="form-control border-secondary" type="text" name="ligne" [(ngModel)]="ligneBudget"></div>
+              <div class="col col-4"><input class="form-control border-secondary" type="number" name="amount" [(ngModel)]="montant"></div>
+              <div class="col col-1"> <i class="fa fa-check" (click)="add()"></i> </div>
+            </div>
+            <div class="row mr-0">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Ligne Budget</th>
+                    <th>Montant</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let ligne of tableauLigneBudget; let index = index;">
+                    <td>{{ ligne.name }}</td>
+                    <td>{{ ligne.amount }}</td>
+                    <td>
+                      <i class="fa fa-pencil" (click)="editer(index)"></i>
+                      <i class="fa fa-trash" (click)="delete(index)"></i>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <br><br><button type="button" class="btn btn-primary" type="submit">OK</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Modifier un poste budgetaire-->
+<div class="modal" id="editPosteBudget">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modifier poste budgetaire</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)='editPoste(edit)' #edit='ngForm'>
+          <div class="row mb-1">
+              <div class="col col-4">Nom</div>
+              <div class="col"><input type="text" name="name" [value]="nomPoste" class="form-control border-secondary" ngModel autocomplete="off"></div>
+            </div>
+            <div class="row ml-0">
+              <div class="col "><input class="form-control border-secondary" type="text" name="ligne" [(ngModel)]="ligneBudget"></div>
+              <div class="col col-4"><input class="form-control border-secondary" type="number" name="amount" [(ngModel)]="montant"></div>
+              <div class="col col-1"> <i class="fa fa-check" (click)="add()"></i> </div>
+            </div>
+            <div class="row mr-0">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Ligne Budget</th>
+                    <th>Montant</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let ligne of tableauLigneBudget; let index = index;">
+                    <td>{{ ligne.name }}</td>
+                    <td>{{ ligne.amount }}</td>
+                    <td>
+                      <i class="fa fa-pencil" (click)="editer(index)"></i>
+                      <i class="fa fa-trash" (click)="delete(index)"></i>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <br><br><button type="button" class="btn btn-primary" type="submit">OK</button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>

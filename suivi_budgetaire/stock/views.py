@@ -163,12 +163,14 @@ def modifapprov(request):
             if(p=="informatique"):
                 infoItem = True
                 break
-        
+        if(infoItem):
+            Approv.objects.filter(id=id).update(infoDecision=0)
+        else:
+            Approv.objects.filter(id=id).update(infoDecision=1)
+        approv = Approv.objects.get(id=id)
         ApprovItem.objects.filter(approv=id).delete()
         for a in app:
             b = json.loads(a)
-            Approv.objects.filter(id=id).update(infoDecision=0)
-            approv = Approv.objects.get(id=id)
             ApprovItem.objects.create(product=Product.objects.get(name=b["product"]), quantity=b["quantity"], approv=approv)
 
     return JsonResponse({'message': 'Enregistrement reussi' })

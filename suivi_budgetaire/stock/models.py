@@ -118,3 +118,33 @@ class Log(models.Model):
 class UploadFile(models.Model):
     title = models.TextField(default="texte par defaut")
     cover = models.ImageField(upload_to='images/', null=True, blank=True)
+
+
+
+class PosteBudget(models.Model):
+    name = models.TextField(max_length=255)
+    type = models.CharField(max_length=255)
+    year = models.IntegerField(null=False)
+
+    def serializable(self):
+        return {
+            "id": self.pk,
+            "name": self.name,
+            "type": self.type,
+            "year": self.year,
+            #"amount": sumAmount([elt.serializable() for elt in LigneBudget.objects.filter(posteBudget__id=self.pk)])
+        }
+
+
+class LigneBudget(models.Model):
+    name = models.CharField(max_length=255)
+    amount = models.IntegerField(null=False)
+    posteBudget = models.ForeignKey(PosteBudget, on_delete= models.CASCADE)
+
+    def serializable(self):
+        return {
+            "id": self.pk,
+            "name": self.name,
+            "amount": self.amount,
+            "poste": self.posteBudget.pk,
+        }

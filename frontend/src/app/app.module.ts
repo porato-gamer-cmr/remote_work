@@ -19,6 +19,8 @@ import { ApprovsService } from './_services/approvs.service';
 import { TicketApprovService } from './_services/ticket-approv.service';
 import { TokenVerificationService } from './_guards/token-verification.service';
 import { TokenInterceptorService } from './_guards/token-interceptor.service';
+import { BudgetComponent } from './budget/budget.component';
+import { BudgetsService } from './_services/budgets.service';
 
 const appRoutes: Routes = [
   {path: 'produits', component: ProduitsComponent, canActivate:[TokenVerificationService]},
@@ -27,6 +29,7 @@ const appRoutes: Routes = [
   {path: 'stats', component: StatsComponent, canActivate:[TokenVerificationService]},
   {path: 'signup', component: SignupComponent},
   {path: 'signin', component: SigninComponent},
+  {path: 'budget', component: BudgetComponent},
   {path: '', redirectTo: 'signin', pathMatch: 'full'}
 ]
 
@@ -40,6 +43,7 @@ const appRoutes: Routes = [
     SigninComponent,
     SignupComponent,
     ContainerComponent,
+    BudgetComponent,
   ],
   imports: [
     RouterModule,
@@ -49,7 +53,7 @@ const appRoutes: Routes = [
     RouterModule.forRoot(appRoutes),
     AppRoutingModule,
   ],
-  providers: [ProduitsService, ApprovsService, TicketApprovService, TokenVerificationService, {
+  providers: [ProduitsService, ApprovsService, TicketApprovService, TokenVerificationService, BudgetsService, {
     provide: HTTP_INTERCEPTORS,
     useClass: TokenInterceptorService,
     multi: true

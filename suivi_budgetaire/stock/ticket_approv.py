@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse
 from django.shortcuts import render
 from .models import TicketApprov, TicketApprovItem, Approv, Product, LigneBudget, PosteBudget
 from django.db.models import F
@@ -14,11 +14,17 @@ JWT_ALGORITHM = 'HS256'
 JWT_EXP_DELTA_SECONDS = 50000
 
 
+def send_file(response):
+    img = open('media/images/imageDePlus_1', 'rb')
+    response = FileResponse(img)
+    return response
+
+
+#Return the sum of all line amount of a poste
 def sumAmount(param):
     b = 0
     for item in param:
         b = b + item['amount']
-        #b=b+item
     return b
 
 

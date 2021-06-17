@@ -31,6 +31,7 @@ urlpatterns = [
     path('decisionapprovticket/', ticket_approv.decisionTicketApprov, name='22'),
     path('approvstats/', ticket_approv.approvStats, name='27'),
     path('sendFile/', test_api.saveFile, name='28'),
+    path('send_file/', ticket_approv.send_file, name='35'),
     #budget
     path('newPoste/', ticket_approv.newPoste, name='29'),
     path('editPoste/', ticket_approv.editPoste, name='30'),

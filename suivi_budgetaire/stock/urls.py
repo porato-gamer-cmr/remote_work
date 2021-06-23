@@ -21,6 +21,11 @@ urlpatterns = [
     path('listapprovsitems/', views.listapprovsitems, name='14'),
     path('deleteapprov/', views.deleteapprov, name='15'),
     path('lockapprov/', views.lockapprov, name='26'),
+    path('addDraft/', views.addDraft, name='39'),
+    path('listDraft/', views.listDraft, name='40'),
+    path('listDraftItem/', views.listDraftItem, name='41'),
+    path('editDraft/', views.editDraft, name='42'),
+    path('deleteDraft/', views.deleteDraft, name='43'),
     #ticket
     path('listapprovsticketitems/', ticket_approv.listTicketApprovsItem, name='16'),
     path('listapprovsticket/', ticket_approv.listTicketApprovs, name='17'),
@@ -38,7 +43,10 @@ urlpatterns = [
     path('allPosteFonctionnement/', ticket_approv.listePosteFonctionnement, name='31'),
     path('allLigneFonctionnement/', ticket_approv.listeLigneFonctionnement, name='32'),
     path('allPosteInvestissement/', ticket_approv.listePosteInvestissement, name='33'),
-    path('allLigneInvestissement/', ticket_approv.listeLigneInvestissement, name='34')
+    path('allLigneInvestissement/', ticket_approv.listeLigneInvestissement, name='34'),
+    path('changePassword/', views.changePassword, name='36'),
+    path('forgetPassword/', views.forgetPassword, name='37'),
+    path('resetPassword/', views.resetPassword, name='38')
     
     
 

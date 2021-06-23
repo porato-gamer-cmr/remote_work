@@ -1,10 +1,8 @@
 <div class="container-fluid">
-    <div class="row my-5">
-        
+    <div class="row my-5" *ngIf="display">
         <div class="col mt-3 col-12 col-md-9 col-lg-5 mx-auto">
             <div class="card my-4 my-lg-0">
                 <div class="card-header">Connexion</div>
-                <div class=""></div>
                 <form (ngSubmit)="signin(f)" #f="ngForm">
                     <div class="card-body">
                     <label for="name">Courriel</label>
@@ -25,7 +23,6 @@
                         <input id="password" type="password" name="password" placeholder="mot de passe" class="form-control bg-white border-right-0" ngModel>
                         <div class="input-group-prepend">
                             <span class="input-group-text bg-white px-4 border-left-0">
-                               <!-- <a href=""><i class="fa fa-eye-slash text-muted"></i></a> -->
                             </span>
                         </div>
                     </div>
@@ -34,7 +31,7 @@
                             <span class="text-danger font-weight-700">Courriel ou mot de passe incorrect</span>
                         </small>
                     </div>
-                    <div><a href="#"><i class="fa fa-chevron-right mr-1"></i>Mot de passe oublié?</a></div>
+                    <div style="cursor: pointer;" (click)="passwordForget('no')"><i class="fa fa-chevron-right mr-1"></i>Mot de passe oublié?</div>
                     </div>
                     <div class="card-footer" style="height: 4em">
                         <div class="form-group row">
@@ -42,6 +39,25 @@
                         </div>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!--Displayed when you click the link #mot de passe oublié-->
+    <div class="row my-5" *ngIf="!display">
+        <div class="card mx-auto" style="width: 25rem;">
+            <div class="card-header">
+                <h5 class="card-title">Réinitialisez votre mot de passe</h5>
+            </div>
+            <div class="card-body">
+                <form (ngSubmit)="sendEmail(mdp)" #mdp="ngForm">
+                    <input class="form-control" name="email" type="email" placeholder="entrez votre adrese mail" required ngModel> <br>
+                    <button class="btn btn-danger" style="float: right" type="submit">Envoyer</button>
+                </form>
+            </div>
+            <div class="card-body">
+                Verifiez votre boite mail, un lien de réinitialisation vous sera envoyé.
+                Retouner à la page de connexion
             </div>
         </div>
     </div>

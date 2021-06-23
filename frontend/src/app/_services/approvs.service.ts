@@ -18,13 +18,22 @@ export class ApprovsService {
   specialApprovsSubject = new Subject<any[]>();
   inferiorApprovsSubject = new Subject<any[]>();
   approvstatsSubject = new Subject<any[]>();
-  approvs=[];
-  approvsItems=[];
-  specialApprovs=[];
-  inferiorApprovs=[];
+  draftSubject = new Subject<any[]>();
+  draftItemSubject = new Subject<any[]>();
+  approvs:any[];
+  approvsItems:any[];
+  specialApprovs:any[];
+  inferiorApprovs:any[];
   approvStats;
+  draft:any[];
+  draftItem:any[];
 
-
+  emitDraftSubject(){
+    this.draftSubject.next(this.draft.slice());
+  }
+  emitDraftItemSubject(){
+    this.draftItemSubject.next(this.draftItem.slice());
+  }
   emitApprovsSubject(){
     this.approvsSubject.next(this.approvs.slice());
   }
@@ -53,7 +62,7 @@ export class ApprovsService {
   }
 
   listApprovs(){
-    this.httpClient.get(environment.url + "listapprovs")
+    this.httpClient.get(environment.url + "listapprovs/")
       .subscribe(
         (data: any[])=>{
           this.approvs = data;
@@ -100,7 +109,7 @@ export class ApprovsService {
       .subscribe(
         (data)=>{
            this.listApprovs();
-           this.listApprovsItems();
+           //this.listApprovsItems();
            this.listInferiorApprovs();
            this.listSpecialApprovs();
            this.getApprovStats();
@@ -112,6 +121,51 @@ export class ApprovsService {
       );
   }
 
+
+  addDraft(draft){
+    this.httpClient.post<any[]>(environment.url + "addDraft/", draft)
+      .subscribe(
+        (data)=>{
+           this.listDraft();
+           console.log("Réussite lors de l ajout d un brouillon");
+        },
+        (error)=>{
+          console.log("Erreur lors de l ajout d un brouillon"+ error);
+        }
+      );
+  }
+
+  listDraft(){
+    this.httpClient.get(environment.url + "listDraft")
+      .subscribe(
+        (data: any[])=>{
+          this.draft = data;
+          this.emitDraftSubject();
+          this.listDraftItem();
+          console.log("reussite lors de la récuperation des brouillons");
+        },
+        (error)=>{
+          console.log("erreur lors de la récuperation des brouillons" + error);
+        }
+      );
+  }
+
+
+  listDraftItem(){
+    this.httpClient.get(environment.url + "listDraftItem/")
+      .subscribe(
+        (data: any[])=>{
+          this.draftItem = data;
+          this.emitDraftItemSubject();
+          console.log("reussite lors de la récuperation des items brouillons");
+        },
+        (error)=>{
+          console.log("erreur lors de la récuperation des items brouillons" + error);
+        }
+      );
+  }
+
+
   deleteApprov(id){
     this.p = confirm("Voulez-vous vraiment supprimer ?");
     if(this.p){
@@ -119,7 +173,7 @@ export class ApprovsService {
       .subscribe(
         (data)=>{
           this.listApprovs();
-          this.listApprovsItems();
+          //this.listApprovsItems();
           this.listInferiorApprovs();
           this.listSpecialApprovs();
           this.getApprovStats();
@@ -127,6 +181,22 @@ export class ApprovsService {
         },
         (error)=>{
           console.log("Erreur lors de la suppression d approv"+ error);
+        }
+      );
+    }
+  }
+
+  deleteDraft(id){
+    this.p = confirm("Voulez-vous vraiment supprimer ?");
+    if(this.p){
+      this.httpClient.post<any[]>(environment.url + "deleteDraft/", {"id":id})
+      .subscribe(
+        (data)=>{
+          this.listDraft();
+          console.log("Réussite lors de la suppression du brouillon");
+        },
+        (error)=>{
+          console.log("Erreur lors de la suppression du brouillon"+ error);
         }
       );
     }
@@ -140,7 +210,7 @@ export class ApprovsService {
       .subscribe(
         (data)=>{
           this.listApprovs();
-          this.listApprovsItems();
+          //this.listApprovsItems();
           this.listInferiorApprovs();
           this.listSpecialApprovs();
           this.getApprovStats();
@@ -164,6 +234,20 @@ export class ApprovsService {
         },
         (error)=>{
           console.log("Erreur lors de la modification de l approv"+ error);
+        }
+      );
+  }
+
+
+  modifDraft(draft){
+    this.httpClient.post<any[]>(environment.url + "editDraft/", draft)
+      .subscribe(
+        (data)=>{
+           this.listDraft();
+           console.log("reussite lors de la modification du brouillon")
+        },
+        (error)=>{
+          console.log("Erreur lors de la modification du brouillon"+ error);
         }
       );
   }

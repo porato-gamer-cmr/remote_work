@@ -18,17 +18,20 @@ declare  var jQuery:  any;
 })
 export class ApprovComponent implements OnInit {
   display:boolean;
+
   @Input() ticketApprovs=[];
   @Input() personnalTicketApprovs=[];
   @Input() ticketApprovsItems=[];
-  
+  @Input() draft=[];
+  @Input() draftItem=[];
   @Input() approvs=[];
   @Input() otherApprovs=[];
   @Input() specialApprovs=[];
   @Input() id;
-  @Input() approvStats:any;
+  @Input() approvStats={all: 0, success: 0, reject: 0, waiting: 0, cancel: 0 };
+  @Input() libelle;
 
-  @Input() allApprovsItems =[];
+  @Input() allApprovsItems=[];
   @Input() new_produit;
   @Input() quantity;
   @Input() produits=[];
@@ -42,6 +45,8 @@ export class ApprovComponent implements OnInit {
   listproduitsSubscription: Subscription;
   otherApprovsSubscription: Subscription;
   specialApprovsSubscription: Subscription;
+  draftSubscription: Subscription;
+  drafItemSubscription: Subscription;
   //ticket approvissionnement
   personnalTicketApprovsSubscription: Subscription;
   approvStatsSubscription: Subscription;
@@ -61,12 +66,22 @@ export class ApprovComponent implements OnInit {
     this.approvsService.listApprovsItems();
     this.approvsService.listSpecialApprovs();
     this.approvsService.getApprovStats();
+    this.approvsService.listDraftItem();
+    this.approvsService.listDraft();
     this.produitsService.listProduits();
     this.produitsSubscription = this.produitsService.produitsSubject.subscribe(
       (data)=>{this.produits = data;}
     )
     this.approvStatsSubscription = this.approvsService.approvstatsSubject.subscribe(
-      (data)=>{this.approvStats = data;}
+      (data)=>{
+        this.approvStats = {
+          all: data['all'],
+          success: data['success'],
+          reject: data['reject'],
+          waiting: data['waiting'],
+          cancel: data['cancel']
+        } 
+      }
     )
     //zone ticket
     this.ticketApprovsSubscription = this.ticketApprovsService.ticketApprovsSubject.subscribe(
@@ -85,6 +100,20 @@ export class ApprovComponent implements OnInit {
       }
     );
     //fin zone ticket
+    //debut brouillon
+
+    this.drafItemSubscription = this.approvsService.draftItemSubject.subscribe(
+      (data)=>{
+        this.draftItem = data;
+      }
+    );
+    this.draftSubscription = this.approvsService.draftSubject.subscribe(
+      (data)=>{
+        this.draft = data;
+      }
+    );
+
+    //fin brouillon
     this.approvsSubscription = this.approvsService.approvsSubject.subscribe(
       (data)=>{
         this.approvs = data;  
@@ -122,10 +151,20 @@ export class ApprovComponent implements OnInit {
       });
     })(jQuery);
   }
+  
+ 
 
-  addApprov(){
-      if(this.listproduits.length>0){this.approvsService.addApprov(this.listproduits);}
-      this.closeModal();
+  addApprov(type){
+    
+    if(this.listproduits.length>0){
+      if(type=='save'){
+        this.approvsService.addDraft({listproduits: this.listproduits, libelle: this.libelle});
+      }else{
+        this.approvsService.addDraft({listproduits: this.listproduits, libelle: this.libelle});
+        this.approvsService.addApprov({listproduits: this.listproduits, libelle: this.libelle});
+      }
+    }
+    this.closeModal();
   }
 
   /** searchother(){
@@ -148,6 +187,9 @@ export class ApprovComponent implements OnInit {
 
   deleteapprov(id){
     this.approvsService.deleteApprov(id);
+  }
+  deletedraft(id){
+    this.approvsService.deleteDraft(id);
   }
   lockapprov(id){
     let p = confirm("voulez-vous vraiment fermer cet approvisionnement ?");
@@ -190,7 +232,6 @@ export class ApprovComponent implements OnInit {
    let produit ={
       quantity: this.quantity,
       product: this.new_produit,
-      approv: this.id
     } 
     
   if(!p){
@@ -216,11 +257,12 @@ export class ApprovComponent implements OnInit {
     this.listproduitsSubject.next(this.listproduits.slice());
   }
 
-  infoApprovs(id, type){
-    this.id=id;
+  infoApprovs(elt, type){
+    this.id=elt.id;
+    this.libelle = elt.libelle;
     if(type=='ticket'){
       let liste=[];
-      this.listproduits = this.allApprovsItems.filter(approv=>approv.approv==id);
+      this.listproduits = this.allApprovsItems.filter(approv=>approv.approv==elt.id);
       for(let i=0; i<this.listproduits.length; i++){
         liste[i]={
           approv: this.listproduits[i].approv,
@@ -232,8 +274,11 @@ export class ApprovComponent implements OnInit {
       }
       this.listproduits = liste;
     }
+    else if(type=='draft'){
+      this.listproduits = this.draftItem.filter(draft=>draft.draft==elt.id);
+    }
     else{
-      this.listproduits = this.allApprovsItems.filter(approv=>approv.approv==id);
+      this.listproduits = this.allApprovsItems.filter(approv=>approv.approv==elt.id);
     }
     
   }
@@ -264,34 +309,85 @@ export class ApprovComponent implements OnInit {
 
 
   modifApprovs(){
-    if(this.listproduits.length>0){this.approvsService.modifApprovs(this.listproduits);}
+    if(this.listproduits.length>0){this.approvsService.modifApprovs({listproduits: this.listproduits, id: this.id, libelle: this.libelle});}
+    this.closeModal();
+  }
+
+  modifDraft(){
+    if(this.listproduits.length>0){this.approvsService.modifDraft({listproduits: this.listproduits, id: this.id, libelle: this.libelle});}
     this.closeModal();
   }
   
   sendCoupon(){
-    if(this.listproduits.length>0){this.ticketApprovsService.addApprovTicket(this.listproduits);}
-    this.closeModal();
+    let isCorrect = true;
+    for(let i=0; i<this.listproduits.length; i++){
+      this.listproduits[i]['send'] = parseInt(document.getElementsByClassName('send_value')[i]['value']);
+      this.listproduitsSubject.next(this.listproduits.slice());
+    }
+    if(this.listproduits.length>0){
+      for(let i=0; i<this.listproduits.length; i++){
+        if(this.listproduits[i]['send']>this.listproduits[i]['waitingquantity'] || this.listproduits[i]['send']>this.listproduits[i]['quantity']){  
+          isCorrect = false;
+          (document.getElementsByClassName('send_value')[i]).setAttribute("style", "background-color:orange;")
+        }
+      }
+      if(isCorrect){ 
+        this.ticketApprovsService.addApprovTicket({listproduits: this.listproduits}); 
+        this.closeModal();}
+      
+    }
+    
   }
   
   sendCoupon1(){
-    if(this.listproduits.length>0){this.ticketApprovsService.modifTicketApprovs(this.listproduits);}
-    this.closeModal();
+    let isCorrect = true;
+    for(let i=0; i<this.listproduits.length; i++){
+      this.listproduits[i]['sendquantity'] = parseInt(document.getElementsByClassName('send_value1')[i]['value']);
+      this.listproduitsSubject.next(this.listproduits.slice());
+    }
+    if(this.listproduits.length>0){
+      for(let i=0; i<this.listproduits.length; i++){
+        if(this.listproduits[i]['sendquantity']>this.listproduits[i]['initialquantity'] ){  
+          isCorrect = false;
+          (document.getElementsByClassName('send_value1')[i]).setAttribute("style", "background-color:orange;")
+        }
+      }
+      if(isCorrect){ 
+        this.ticketApprovsService.modifTicketApprovs({listproduits: this.listproduits}); 
+        this.closeModal();}
+      
+    }
   }
 
-  changeValue(index, property){
+  changeValue(index){
     let value = parseInt(document.getElementsByClassName('send_value')[index]['value']);
-    this.listproduits[index][property] =(value>0) ? value : -value;
-    this.listproduitsSubject.next(this.listproduits.slice());
+    if(value > this.listproduits[index]['quantity'] || value > this.listproduits[index]['waitingquantity']){
+      (document.getElementsByClassName('send_value')[index]).setAttribute("style", "background-color:orange;");
+    }else{
+      (document.getElementsByClassName('send_value')[index]).setAttribute("style", "background-color:white;");      
+    }
   }
 
   changeValue1(index, property){
-    this.listproduits[index][property] =parseInt(document.getElementsByClassName('send_value1')[index]['value']);
-    this.listproduitsSubject.next(this.listproduits.slice());
+    let value = parseInt(document.getElementsByClassName('send_value1')[index]['value']);
+    if(value > this.listproduits[index]['initialquantity']){
+      (document.getElementsByClassName('send_value1')[index]).setAttribute("style", "background-color:orange;")
+    }else{
+      (document.getElementsByClassName('send_value1')[index]).setAttribute("style", "background-color:white;")
+    }
   }
   
   deleteTicketApprovs(id){
     let p = confirm("Voulez-vous vraiment supprimer ?");
     if(p){this.ticketApprovsService.deleteApprovTicket(id);}
     
+  }
+
+  modif_Save_Draft(){
+    if(this.listproduits.length>0){
+      this.approvsService.modifDraft({listproduits: this.listproduits, id: this.id, libelle: this.libelle});
+      this.approvsService.addApprov({listproduits: this.listproduits, id: this.id, libelle: this.libelle});
+    }
+    this.closeModal();
   }
 }

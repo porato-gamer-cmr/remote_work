@@ -1,5 +1,6 @@
 <!-- header of the application-->
 <app-container></app-container>
+
 <div class="row">
   <div class="col">
     <ul class="nav nav-tabs" id="mytab" role="tablist">
@@ -54,12 +55,12 @@
           </div>
         </div>
         <!--Personnal approvs-->
-        <div class="row" *ngIf="approvs.length == 0">
+        <div class="row" *ngIf="approvs.length == 0 && draft.length == 0">
           <div class="col">
             Aucun élément pour l'instant
           </div>
         </div>
-        <div class="row" id="tableau" *ngIf="approvs.length > 0">
+        <div class="row" id="tableau" *ngIf="approvs.length > 0 || draft.length > 0">
           <div class="col">
               <table class="table table-bordered">
                 <thead>
@@ -71,19 +72,29 @@
                   </tr>
                 </thead>
                 <tbody>
+                  <tr class="row_table"  *ngFor="let df of draft;">
+                    <td>{{ df.id }}</td>
+                    <td><i class="fa fa-circle" style="color: black;">brouillon</i></td>
+                    <td>{{ df.instant }}</td>
+                    <td class="non-align">
+                      <i class="fa fa-info mr-3" (click)="infoApprovs(df, 'draft')" data-toggle="modal" data-target="#infoApprov" title="info"></i>
+                      <i class="fa fa-pencil mr-3" (click)="infoApprovs(df, 'draft')" data-toggle="modal" data-target="#modifdraftform"></i>
+                      <i class="fa fa-trash mr-3" (click)="deletedraft(df.id)"></i>
+                    </td>
+                  </tr>
                   <tr class="row_table"  *ngFor="let approv of approvs; let index=index;">
                     <td>{{ approv.id }}</td>
                     <td>
-                      <i *ngIf="approv.higherDecision==1 && approv.infoDecision==1" class="fa fa-circle" style="color: green;"></i>
-                      <i *ngIf="(approv.higherDecision==1 && approv.infoDecision==0) || (approv.higherDecision==0 && approv.infoDecision==0) || (approv.higherDecision==0 && approv.infoDecision==1)"  class="fa fa-circle" style="color: cyan;"></i>
-                      <i *ngIf="approv.higherDecision==3" class="fa fa-circle" style="color: red;"></i>
-                      <i *ngIf="(approv.higherDecision==1 && approv.infoDecision==2) || (approv.higherDecision==2 && approv.infoDecision==0)"  class="fa fa-circle" style="color: yellow;"></i>
+                      <i *ngIf="approv.higherDecision==1 && approv.infoDecision==1" class="fa fa-circle" style="color: green;">En cours</i>
+                      <i *ngIf="(approv.higherDecision==1 && approv.infoDecision==0) || (approv.higherDecision==0 && approv.infoDecision==0) || (approv.higherDecision==0 && approv.infoDecision==1)"  class="fa fa-circle" style="color: cyan;">En attente</i>
+                      <i *ngIf="approv.higherDecision==3" class="fa fa-circle" style="color: red;">Annulée</i>
+                      <i *ngIf="(approv.infoDecision==2) || (approv.higherDecision==2)"  class="fa fa-circle" style="color: yellow;">Rejetée</i>
                     </td>
                     <td> {{ approv.instant }} </td>
                     <td class="non-align">
-                      <i class="fa fa-info mr-3" (click)="infoApprovs(approv.id, 'approv')" data-toggle="modal" data-target="#infoApprov" title="info"></i>
-                      <i class="fa fa-pencil mr-3" (click)="infoApprovs(approv.id, 'approv')" data-toggle="modal" data-target="#modifapprovform"></i>
-                      <i class="fa fa-times-circle mr-3" (click)="lockapprov(approv.id)" *ngIf="approv.higherDecision==1 && approv.infoDecision==1"></i>
+                      <i class="fa fa-info mr-3" (click)="infoApprovs(approv, 'approv')" data-toggle="modal" data-target="#infoApprov" title="info"></i>
+                      <i *ngIf="(approv.infoDecision==2) || (approv.higherDecision==2)" class="fa fa-pencil mr-3" (click)="infoApprovs(approv, 'approv')" data-toggle="modal" data-target="#modifapprovform"></i>
+                      <i *ngIf="approv.higherDecision==1 && approv.infoDecision==1" class="fa fa-times-circle mr-3" (click)="lockapprov(approv.id)"></i>
                       <i class="fa fa-trash mr-3" (click)="deleteapprov(approv.id)" *ngIf="(approv.higherDecision==0 && approv.infoDecision==1) || (approv.higherDecision==0 && approv.infoDecision==0) || (approv.higherDecision==1 && approv.infoDecision==0)"></i>
                     </td>
                   </tr>
@@ -122,7 +133,7 @@
                   <td>{{ approv.user }}</td>
                   <td> {{ approv.instant }} </td>
                   <td>
-                    <i class="fa fa-info mr-3" (click)="infoApprovs(approv.id, 'approv')" data-toggle="modal" data-target="#specialInfoApprov" ></i>
+                    <i class="fa fa-info mr-3" (click)="infoApprovs(approv, 'approv')" data-toggle="modal" data-target="#specialInfoApprov" ></i>
                   </td>
                 </tr>
               </tbody>
@@ -161,9 +172,9 @@
                   <td>{{ approv.user }}</td>
                   <td> {{ approv.instant }} </td>
                   <td>
-                    <i class="fa fa-info mr-3" (click)="infoApprovs(approv.id, 'approv')" data-toggle="modal" data-target="#infoApprov"></i>
-                    <i class="fa fa-plus mr-3" *ngIf="role=='rmg' " (click)="infoApprovs(approv.id, 'ticket')" data-toggle="modal" data-target="#addTicketApprov"></i>
-                    <i class="fa fa-book mr-3" *ngIf="role=='rmg' " (click)="listTicketApprov(approv.id)" data-toggle="modal" data-target="#listTicketApprov"></i>
+                    <i class="fa fa-info mr-3" (click)="infoApprovs(approv, 'approv')" data-toggle="modal" data-target="#infoApprov"></i>
+                    <i class="fa fa-plus mr-3" *ngIf="role=='rmg' " (click)="infoApprovs(approv, 'ticket')" data-toggle="modal" data-target="#addTicketApprov"></i>
+                    <i class="fa fa-book mr-3" *ngIf="role=='rmg' " (click)="listTicketApprov(approv)" data-toggle="modal" data-target="#listTicketApprov"></i>
                   </td>
                 </tr>
               </tbody>
@@ -283,6 +294,10 @@
           </button>
         </div>
         <div class="modal-body">
+          <div class="row">
+            <div class="col col-4"> Libellé </div>
+            <div class="col col-8"> {{ libelle }}</div>
+          </div>
           <table class="table table-bordered">
             <thead>
               <tr class="first_row_table">
@@ -356,6 +371,10 @@
           </button>
         </div>
         <div class="modal-body">
+          <div class="row">
+            <div class="col col-4"> Libellé </div>
+            <div class="col col-8"> {{ libelle }}</div>
+          </div>
           <table class="table table-bordered">
             <thead>
               <tr class="first_row_table">
@@ -426,21 +445,24 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Créer Approv</h5>
+          <h5 class="modal-title">Demande Approv</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-
+          <div class="row">
+            <div class="col col-4"> Libellé </div>
+            <div class="col col-8"> <input type="text" name="libelle" autocomplete="off" [(ngModel)]="libelle"> </div>
+          </div>
           <div class="row mb-1">
             <div class="col">
-                <select class="form-select" name="product" autocomplete="off" [(ngModel)]="new_produit">
+                <select class="form-select" name="product" [(ngModel)]="new_produit">
                     <option *ngFor="let produit of produits" value="{{ produit.name }}">{{ produit.name }}</option>
                 </select>
             </div>
-            <div class="col"><input class="form-control" type="number" name="quantity" [(ngModel)]="quantity" autocomplete="off"></div>
-            <div class="col"><button class="btn btn-primary" (click)='updateListProd()'><i class="fa fa-check"></i></button></div>
+            <div class="col"><input class="form-control" type="number" name="quantity" [(ngModel)]="quantity" autocomplete="off" placeholder="quantité"></div>
+            <div class="col"><button  (click)='updateListProd()'><i class="fa fa-check"></i></button></div>
         </div>
           
                 <table class="table table-bordered">
@@ -466,8 +488,11 @@
                 
               <div class="row mb-1">
                   <div class="col">
-                      <button type="button" class="btn btn-primary" (click)="addApprov()"><i class="fa fa-check"></i>Save</button>
+                      <button type="button" (click)="addApprov('save')"><i class="fa fa-check"></i>Save</button>
                   </div>
+                  <div class="col">
+                    <button type="button" (click)="addApprov('send')"><i class="fa fa-check"></i>Save & Send</button>
+                </div>
               </div>
                 
         </div>
@@ -475,7 +500,7 @@
       </div>
     </div>
   </div>
-  <!-- End Create Modal Produit-->
+  <!-- End Create Modal Approv-->
 
 
   <!--Start Create Modal-->
@@ -483,13 +508,16 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Modif Approv</h5>
+          <h5 class="modal-title">Modif Demande</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-
+          <div class="row">
+            <div class="col col-4"> Libellé </div>
+            <div class="col col-8"> <input type="text" name="libelle" autocomplete="off" [(ngModel)]="libelle"> </div>
+          </div>
           <div class="row mb-1">
             <div class="col">
                 <select class="form-select" name="product" autocomplete="off" [(ngModel)]="new_produit">
@@ -497,7 +525,7 @@
                 </select>
             </div>
             <div class="col"><input class="form-control" type="number" name="quantity" [(ngModel)]="quantity" autocomplete="off"></div>
-            <div class="col"><button class="btn btn-primary" (click)='updateitem()'><i class="fa fa-check"></i></button></div>
+            <div class="col"><button (click)='updateitem()'><i class="fa fa-check"></i></button></div>
         </div>
           
                 <table class="table table-bordered">
@@ -531,10 +559,69 @@
       </div>
     </div>
   </div>
-  <!-- End Create Modal Produit-->
+  <!-- End Create Modal Approv-->
 
 
-
+<!--Start Create Modal-->
+<div class="modal" id="modifdraftform">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modif Brouillon</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col col-4"> Libellé </div>
+          <div class="col col-8"> <input type="text" name="libelle" autocomplete="off" [(ngModel)]="libelle"> </div>
+        </div>
+        <div class="row mb-1">
+          <div class="col">
+              <select class="form-select" name="product" autocomplete="off" [(ngModel)]="new_produit">
+                  <option *ngFor="let produit of produits" value="{{ produit.name }}">{{ produit.name }}</option>
+              </select>
+          </div>
+          <div class="col"><input class="form-control" type="number" name="quantity" [(ngModel)]="quantity" autocomplete="off"></div>
+          <div class="col"><button class="btn btn-primary" (click)='updateitem()'><i class="fa fa-check"></i></button></div>
+      </div>
+        
+              <table class="table table-bordered">
+                <thead>
+                  <tr class="first_row_table">
+                    <th>Nom</th>
+                    <th>Quantite</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="row_table" *ngFor="let app of listproduits; let index=index;">
+                    <td>{{ app.product }}</td>
+                    <td>{{ app.quantity }}</td>
+                    <td>
+                      <i class="fa fa-trash mr-3" (click)="deleteitem(index)"></i>
+                      <i class="fa fa-pencil mr-3" (click)="modification(index)"></i>
+                    </td>
+                  </tr>
+                </tbody>
+            </table>
+              
+            <div class="row mb-1">
+                <div class="col">
+                    <button class="btn btn-primary" (click)="modifDraft()"><i class="fa fa-check"></i>Save</button>
+                </div>
+                <div class="col">
+                  <button class="btn btn-primary" (click)="modif_Save_Draft()"><i class="fa fa-check"></i>Save & Send</button>
+              </div>
+            </div>
+              
+      </div>
+        
+    </div>
+  </div>
+</div>
+<!-- End Create Modal Edit draft-->
 
 
   <!--Start Livrer produit Modal-->
@@ -562,7 +649,7 @@
                 <td>{{ app.product }}</td>
                 <td>{{ app.waitingquantity }}</td>
                 <td>{{ app.quantity }}</td>
-                <td><input (blur)="changeValue(index, 'send')" type="number" class="send_value"></td>
+                <td><input (keyup)="changeValue(index)" type="number" class="send_value"></td>
               </tr>
             </tbody>
           </table>
@@ -599,7 +686,7 @@
               <tr class="row_table1" *ngFor="let app of listproduits; let index=index;">
                 <td>{{ app.product }}</td>
                 <td>{{ app.initialquantity }}</td>
-                <td><input (blur)="changeValue1(index, 'sendquantity')" value="{{ app.sendquantity }}" type="number" class="send_value1"></td>
+                <td><input (keyup)="changeValue1(index)" value="{{ app.sendquantity }}" type="number" class="send_value1"></td>
               </tr>
             </tbody>
           </table>

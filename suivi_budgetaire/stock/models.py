@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.db import models
 
 # Product model
@@ -23,7 +24,6 @@ class Product(models.Model):
 #User model
 class User(models.Model):
     email = models.CharField(max_length=200, unique=True)
-    #email = models.EmailField(unique=True)
     name = models.CharField(max_length=200, unique=True)
     password = models.CharField(max_length=200)
     higher = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
@@ -41,21 +41,54 @@ class User(models.Model):
 #approv model
 class Approv(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    instant = models.DateTimeField(auto_now_add=True)
+    instant = models.DateTimeField(default=datetime.now())
     higherDecision = models.IntegerField()
     infoDecision = models.IntegerField()
     message = models.CharField(max_length=200)
     state = models.BooleanField(default=False)
+    libelle = models.CharField(max_length=200, default="")
 
     def serializable(self):
         return {
             "id": self.pk,
             "user": self.user.name,
-            "instant": self.instant,
+            "instant": str(self.instant.strftime("%x"))+" à "+str(self.instant.strftime("%X")),
             "higherDecision": self.higherDecision,
             "infoDecision": self.infoDecision,
-            "message": self.message
+            "message": self.message,
+            "libelle": self.libelle
         }
+
+
+#draft model
+class Draft(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    instant = models.DateTimeField(default=datetime.now())
+    libelle = models.CharField(max_length=200, default="")
+
+    def serializable(self):
+        return {
+            "id": self.pk,
+            "user": self.user.name,
+            "instant": str(self.instant.strftime("%x"))+" à "+str(self.instant.strftime("%X")),
+            "libelle": self.libelle
+        }
+
+
+#draftItem
+class DraftItem(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    draft = models.ForeignKey(Draft, on_delete=models.CASCADE)
+
+    def serializable(self):
+        return {
+            "id": self.pk,
+            "product": self.product.name,
+            "quantity": self.quantity,
+            "draft": self.draft.pk,
+        }
+
 
 
 #ApprovItem model
@@ -132,7 +165,7 @@ class PosteBudget(models.Model):
             "name": self.name,
             "type": self.type,
             "year": self.year,
-            #"amount": sumAmount([elt.serializable() for elt in LigneBudget.objects.filter(posteBudget__id=self.pk)])
+            #"amount": sumAmount(-)
         }
 
 

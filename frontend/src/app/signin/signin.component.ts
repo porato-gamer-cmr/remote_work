@@ -13,10 +13,13 @@ import { environment } from 'src/environments/environment';
 export class SigninComponent implements OnInit {
 
   isLogging: boolean = true;
+  display = true;
   helper = new JwtHelperService();
+
   constructor(private httpClient: HttpClient, private route: Router) { }
   ngOnInit(): void {
   }
+
   signin(form: NgForm){
     
     let user={
@@ -34,6 +37,24 @@ export class SigninComponent implements OnInit {
       }
     );
     
+  }
+
+  passwordForget(value){
+    if(value=='no'){
+      this.display = !this.display;
+    }
+    else{
+      this.display = !this.display;
+    }
+    
+  }
+
+  sendEmail(form: NgForm){
+    this.httpClient.post("http://172.16.16.195:8000/stock/forgetPassword/", form.value.email).subscribe(
+        (data)=>{
+        },
+        (error)=>{ console.log(error); }
+      );
   }
   
  

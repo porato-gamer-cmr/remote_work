@@ -123,7 +123,7 @@ def decisionTicketApprov(request):
 @csrf_exempt
 def sendingMail(receiver, name):
     subject = "Ticket approvision"
-    message = "Bonjour monsieur {name}, veillez confirmer la reception du matériel recu".format(name=name)
+    message = "Bonjour monsieur {0}, veillez confirmer la reception du matériel recu".format(name)
     send_mail(subject, message, 'jerarlmalim@gmail.com' , [receiver], fail_silently = False)
 
 
@@ -151,42 +151,29 @@ def listTicketApprovsItem(request):
 
 @csrf_exempt
 def addTicketApprovs(request):
-    req = request.body
-    my_json = req.decode('utf8').replace("'", '"')
-    my_json = my_json.replace(",{", ";{")
-    my_json = my_json.replace("[", "")
-    my_json = my_json.replace("]", "")
-    app = my_json.split(";")
-    payload = tokenVerification(request.headers['Authorization'].split(' ')[1])
-    ticketApprov = TicketApprov.objects.create(approv=Approv.objects.get( id=(json.loads(app[0]))["approv"] ), message="")
-    ticketApprov.save()
-    for item in app:
-        item=json.loads(item)
-        if (item['send'] >  Product.objects.filter(name=item['product']).waitingquantity ):
-            return JsonResponse({'message': 'Le ticket ne peut etre créé car certains produits ne sont pas suffissant en stock'})
-        else:
-            TicketApprovItem.objects.create(product=item['product'], sendquantity=item['send'], initialquantity=item['quantity'], ticketapprov=ticketApprov)
-            Product.objects.filter(name=item['product']).update(waitingquantity=F('waitingquantity')-item['send'])
-    data=Approv.objects.get( id=(json.loads(app[0]) )["approv"] )
+    data = json.loads((request.body).decode('utf-8'))
+    """payload = tokenVerification(request.headers['Authorization'].split(' ')[1])
+    ticketApprov = TicketApprov.objects.create(approv=Approv.objects.get(id=data['listproduits'][0]['approv']), message="")
+    for item in data['listproduits']:
+        TicketApprovItem.objects.create(product=item['product'], sendquantity=item['send'], initialquantity=item['quantity'], ticketapprov=ticketApprov)
+        Product.objects.filter(name=item['product']).update(waitingquantity=F('waitingquantity')-item['send'])"""
+    data=Approv.objects.get( id = data['listproduits'][0]['approv'] )
     sendingMail(data.user.email, data.user.name)
+    sendingMail(data.user.higher.email, data.user.higher.name)
     return JsonResponse({})
 
 
 @csrf_exempt
 def modifTicketApprov(request):
-    req = request.body
-    my_json = req.decode('utf8').replace("'", '"')
-    my_json = my_json.replace(",{", ";{")
-    my_json = my_json.replace("[", "")
-    my_json = my_json.replace("]", "")
-    app = my_json.split(";")
+    data = json.loads((request.body).decode('utf-8'))
     payload = tokenVerification(request.headers['Authorization'].split(' ')[1])
-    ticketApprov = TicketApprov.objects.get(id=(json.loads(app[0]))['ticketapprov'])
-    for item in app:
-        item = json.loads(item)
+    ticketApprov = TicketApprov.objects.get(id=data['listproduits'][0]['ticketapprov'])
+    for item in data['listproduits']:
         Product.objects.filter(name=item['product']).update(waitingquantity=F('waitingquantity') + TicketApprovItem.objects.filter(ticketapprov=item['ticketapprov'], product=item['product'])[0].sendquantity )
         Product.objects.filter(name=item['product']).update(waitingquantity=F('waitingquantity') - item['sendquantity'])
         TicketApprovItem.objects.filter(ticketapprov=item['ticketapprov'], product=item['product']).update(sendquantity=item['sendquantity'])
+        sendingMail(data.user.email, data.user.name)
+        sendingMail(data.user.higher.email, data.user.higher.name)
     return JsonResponse({"message": "well done"})
 
 

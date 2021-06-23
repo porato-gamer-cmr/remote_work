@@ -116,6 +116,7 @@
     .form-select{
         height: 30px;
         width: 200px;
+        margin-left: -25px;
     }
 
     .close{color: red;}

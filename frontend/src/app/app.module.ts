@@ -21,6 +21,7 @@ import { TokenVerificationService } from './_guards/token-verification.service';
 import { TokenInterceptorService } from './_guards/token-interceptor.service';
 import { BudgetComponent } from './budget/budget.component';
 import { BudgetsService } from './_services/budgets.service';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
 const appRoutes: Routes = [
   {path: 'produits', component: ProduitsComponent, canActivate:[TokenVerificationService]},
@@ -30,6 +31,7 @@ const appRoutes: Routes = [
   {path: 'signup', component: SignupComponent},
   {path: 'signin', component: SigninComponent},
   {path: 'budget', component: BudgetComponent},
+  {path: 'reset-password/:id', component: ResetPasswordComponent},
   {path: '', redirectTo: 'signin', pathMatch: 'full'}
 ]
 
@@ -44,6 +46,7 @@ const appRoutes: Routes = [
     SignupComponent,
     ContainerComponent,
     BudgetComponent,
+    ResetPasswordComponent,
   ],
   imports: [
     RouterModule,

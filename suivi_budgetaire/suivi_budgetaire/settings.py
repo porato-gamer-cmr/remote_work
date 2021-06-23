@@ -34,7 +34,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'jerarlmalim@gmail.com'
-EMAIL_HOST_PASSWORD = 'porato225'
+EMAIL_HOST_PASSWORD = 'pascale2021'
 
 
 # Application definition
@@ -89,7 +89,7 @@ WSGI_APPLICATION = 'suivi_budgetaire.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'suivi0406',
+        'NAME': 'suivi2306',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         'HOST': '127.0.0.1',
@@ -123,7 +123,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'fr'
 
-TIME_ZONE = 'Europe/Paris'
+TIME_ZONE = 'Africa/Douala'
 
 USE_I18N = True
 

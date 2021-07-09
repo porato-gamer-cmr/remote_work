@@ -9,6 +9,7 @@
     .non-align{
         text-align: left;
         width: 20%;
+        margin-left: 150px;
     }
     
     .card{
@@ -40,8 +41,7 @@
     }
     .input_search:focus{
     width:400px;
-    box-shadow:  2px 2px 10px #b8b8b8, 
-                    -2px -2px 10px #ffffff;
+    box-shadow:  2px 2px 10px #b8b8b8, -2px -2px 10px #ffffff;
     }
     
     input{
@@ -49,8 +49,7 @@
     padding:15px;
     height:30px;
     background:rgb(255,255,255);
-    box-shadow:  1px 1px 3px #b8b8b8, 
-                    -1px -1px 3px #ffffff;
+    box-shadow:  1px 1px 3px #b8b8b8, -1px -1px 3px #ffffff;
     margin-left:30px;
     }
     
@@ -76,10 +75,7 @@
         height:50px;
         } **/
     
-    .fa{
-    padding-left:10px;
-    padding-right:10px;
-    }
+    
     .modal{
     height:auto;
     padding:30px;
@@ -121,13 +117,12 @@
 
     .close{color: red;}
 
-    /** .circle{
-        height: 500px;
-        width: 500px;
-        border-radius: 50%;
-        color: blue;
-        background-color: blue;
-    } **/
+    .btn-fav{
+        height: 30px;
+        width: 30px;
+        margin-left: 2px;
+        margin-right: 2px;
+    }
     
 
     

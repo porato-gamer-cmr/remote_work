@@ -1,46 +1,137 @@
 <app-container></app-container>
-<h2>Bootstrap - year picker only example</h2>
-<input id="date-own" type="text">
+<div class="row">
+  <div class="col">
+    <button class="btn btn-success" data-toggle="modal" data-target="#bondecommande"><i class="fa fa-user-plus"></i></button>
+    <button class="btn btn-success" data-toggle="modal" data-target="#"><i class="fa fa-upload"></i></button>
+    <button class="btn btn-success"><i class="fa fa-download"></i></button>
+  </div>
+  <div class="col">
+      <input class="input_search" placeholder="search"  autocomplete="off">
+  </div>
+</div>
 
-<div class="accordion" id="accordionExample">
-    <div class="accordion-item">
-      <h2 class="accordion-header" id="headingOne">
-        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-          Accordion Item #1
-        </button>
-      </h2>
-      <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-        <div class="accordion-body">
-          <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+  <!--Start Create Approv Modal-->
+  <div class="modal" id="bondecommande">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">BON DE COMMANDE</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
-      </div>
-    </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header" id="headingTwo">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-          Accordion Item #2
-        </button>
-      </h2>
-      <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
-        <div class="accordion-body">
-          <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+        <div class="modal-body">
+          <div class="row mb-1">
+            <div class="col col-4"> Fournisseur </div>
+            <div class="col col-8"> <input type="text" name="fournisseur" autocomplete="off" [(ngModel)]="fournisseur"> </div>
+          </div>
+          <div class="row mb-1">
+            <div class="col">
+                <select class="form-select" name="product" [(ngModel)]="product">
+                    <option *ngFor="let product of products" value="{{ product }}">{{ product }}</option>
+                </select>
+            </div>
+            <div class="col"><input class="form-control" type="number" name="quantity" [(ngModel)]="quantity" placeholder="quantité"></div>
+            <div class="col"><input class="form-control" type="number" name="unit_price" [(ngModel)]="unit_price" placeholder="prix unitaire"></div>
+            <div class="col"><button (click)="updateList()"><i class="fa fa-check"></i></button></div>
+          </div>
+          
+                <table class="table table-bordered">
+                  <thead>
+                    <tr class="first_row_table">
+                      <th>N°</th>
+                      <th>Nom</th>
+                      <th>Quantité</th>
+                      <th>Prix Unitaire</th>
+                      <th>Prix Totale</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="row_table" *ngFor="let item of listproduits; let index=index;">
+                      <td>{{ index+1 }}</td>
+                      <td>{{ item.product }}</td>
+                      <td>{{ item.quantity }}</td>
+                      <td>{{ item.unit_price }}</td>
+                      <td>{{ item.total_price }}</td>
+                      <td>
+                        <i class="fa fa-trash mr-3" (click)="deleteItem(index)"></i>
+                        <i class="fa fa-pencil mr-3" (click)="focusItem(index)"></i>
+                      </td>
+    
+                    </tr>
+                  </tbody>
+              </table>
+                
+              <div class="row mb-1">
+                  <div class="col">
+                      <button type="button" (click)="openPDF()"><i class="fa fa-check"></i>Save</button>
+                  </div>
+                  <div class="col">
+                    Prix Totale: {{ bill_price }}
+                </div>
+              </div>
+                
         </div>
-      </div>
-    </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header" id="headingThree">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-          Accordion Item #3
-        </button>
-      </h2>
-      <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
-        <div class="accordion-body">
-          <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-        </div>
+          
       </div>
     </div>
   </div>
-  
 
 
 
+
+   <!--Start Report Bon De Commande-->
+   <div class="modal" id="report_bondecommande">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">BON DE COMMANDE</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row mb-1">
+            <div class="col col-4"> Fournisseur </div>
+            <div class="col col-8"> {{ fournisseur }} </div>
+          </div>
+            <table class="table table-bordered">
+              <thead>
+                <tr class="first_row_table">
+                  <th>N°</th>
+                  <th>Nom</th>
+                  <th>Quantité</th>
+                  <th>Prix Unitaire</th>
+                  <th>Prix Totale</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="row_table" *ngFor="let item of listproduits; let index=index;">
+                  <td>{{ index+1 }}</td>
+                  <td>{{ item.product }}</td>
+                  <td>{{ item.quantity }}</td>
+                  <td>{{ item.unit_price }}</td>
+                  <td>{{ item.total_price }}</td>
+                </tr>
+              </tbody>
+              </table>
+                
+              <div class="row mb-1">
+                  <div class="col">
+                      <button type="button" (click)="openPDF()"><i class="fa fa-check"></i>Save</button>
+                  </div>
+                  <div class="col">
+                    Prix Totale: {{ bill_price }}
+                </div>
+              </div>
+                
+        </div>
+          
+      </div>
+    </div>
+  </div>
+
+  <div id="report_bondecommande1" hidden>
+    <p>hqzfpEF)QFJ PRJG Q PP R JERGM,NEJĜ kGE=ZEIP,ZEPR,QP GPQQOGINZIH,Eupoeghzegthyshsghshsrtb tyrs hs</p>
+   </div>

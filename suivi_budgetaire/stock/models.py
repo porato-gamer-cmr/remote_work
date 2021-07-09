@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import MAXYEAR, datetime, timezone
 from django.db import models
 
 # Product model
@@ -9,6 +9,8 @@ class Product(models.Model):
     security = models.IntegerField()
     warning = models.IntegerField()
     type = models.CharField(max_length=200)
+    numero_compte = models.CharField(max_length=200)
+
 
     def serializable(self):
         return {
@@ -18,8 +20,10 @@ class Product(models.Model):
             "waitingquantity": self.waitingquantity,
             "security": self.security,
             "warning": self.warning,
-            "type": self.type
+            "type": self.type,
+            "numero_compte": self.numero_compte
         }
+
 
 #User model
 class User(models.Model):
@@ -41,10 +45,10 @@ class User(models.Model):
 #approv model
 class Approv(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    instant = models.DateTimeField(default=datetime.now())
+    instant = models.DateTimeField(default=datetime.now() )
     higherDecision = models.IntegerField()
     infoDecision = models.IntegerField()
-    message = models.CharField(max_length=200)
+    message = models.CharField(max_length=200, default="")
     state = models.BooleanField(default=False)
     libelle = models.CharField(max_length=200, default="")
 
@@ -56,14 +60,15 @@ class Approv(models.Model):
             "higherDecision": self.higherDecision,
             "infoDecision": self.infoDecision,
             "message": self.message,
-            "libelle": self.libelle
+            "libelle": self.libelle,
+            "isDraft": True if self.higherDecision==-1 else False
         }
 
 
 #draft model
 class Draft(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    instant = models.DateTimeField(default=datetime.now())
+    instant = models.DateTimeField(default=datetime.now)
     libelle = models.CharField(max_length=200, default="")
 
     def serializable(self):
@@ -105,14 +110,15 @@ class ApprovItem(models.Model):
             "product": self.product.name,
             "quantity": self.quantity,
             "approv": self.approv.pk,
-            "sendquantity": self.sendquantity
+            "send": self.sendquantity,
+            "reste": self.quantity - self.sendquantity
         }
 
 
 class TicketApprov(models.Model):
     approv = models.ForeignKey(Approv, on_delete=models.CASCADE)
     userDecision = models.IntegerField(default=0)
-    instant = models.DateTimeField(auto_now_add=True)
+    instant = models.DateTimeField(default=datetime.now)
     message = models.CharField(max_length=200)
 
     def serializable(self):
@@ -144,7 +150,8 @@ class TicketApprovItem(models.Model):
 
 #Log model user, date and action 
 class Log(models.Model):
-    user=models.CharField(max_length=200)
+    #user=models.CharField(max_length=200)
+    instant=models.DateTimeField(default=datetime.now)
 
 
 #model for file upload 
@@ -180,4 +187,55 @@ class LigneBudget(models.Model):
             "name": self.name,
             "amount": self.amount,
             "poste": self.posteBudget.pk,
+        }   
+
+
+
+class Fournisseur(models.Model):
+    name = models.CharField(max_length=200)
+    numero_tier = models.CharField(max_length=200)
+    numero_compte = models.CharField(max_length=200)
+
+    def serializable(self):
+        return {
+            "id": self.pk,
+            "name": self.name,
+            "numero_tier": self.numero_tier,
+            "numero_compte": self.numero_compte,
+        }
+
+
+class BonCommande(models.Model):
+    instant = models.CharField(max_length=200)
+    fournisseur = models.ForeignKey(Fournisseur, on_delete=models.CASCADE)
+    numero_piece = models.CharField(max_length=200)
+    cgaiDecision = models.IntegerField()
+    dgDecision = models.IntegerField()
+    tva = models.FloatField() 
+
+    def serializable(self):
+        return {
+            "id": self.pk,
+            "instant": self.instant,
+            "fournisseur": self.fournisseur,
+            "numero_piece": self.numero_piece,
+            "cgaiDecision": self.cgaiDecision,
+            "dgDecision": self.dgDecision,
+            "tva": self.tva
+        }
+
+
+class BonCommandeItem(models.Model):
+    product = models.CharField(max_length=200)
+    unit_price = models.IntegerField()
+    quantity = models.IntegerField()
+    bon_commande = models.ForeignKey(BonCommande, on_delete=models.CASCADE)
+
+    def serializable(self):
+        return {
+            "id": self.pk,
+            "product": self.product,
+            "unit_price": self.unit_price,
+            "quantity": self.quantity,
+            "bon_commande": self.bon_commande.pk
         }

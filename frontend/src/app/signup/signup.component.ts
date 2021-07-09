@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { ApprovsService } from '../_services/approvs.service';
 import { Subject, Subscription } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { error } from 'selenium-webdriver';
+declare  var jQuery:  any;
 
 
 
@@ -30,9 +30,6 @@ export class SignupComponent implements OnInit {
     this.httpClient.get(environment.url+"listuser").subscribe(
       (data: any[])=>{
         this.users = data;
-        for (let i=0; i<this.users.length; i++){
-          console.log(this.users[i].password);
-        }
       }
     );
   }
@@ -47,12 +44,30 @@ export class SignupComponent implements OnInit {
     };
     this.httpClient.post<any[]>(environment.url+"signup/", user).subscribe(
       (data)=>{
-        console.log(data);
         this.route.navigate(['/signin']);
       }, (error)=>{
         this.isSignup = false;
       }
     );
+  }
+
+
+  hide_show(){
+    (function ($) {
+      $("#show_hide_password").on('click', function(event) {
+        event.preventDefault();
+        if($('#show_hide_password input').attr("type") == "text"){
+            $('#show_hide_password input').attr('type', 'password');
+            $('#show_hide_password i').addClass( "fa-eye-slash" );
+            $('#show_hide_password i').removeClass( "fa-eye" );
+         }
+         else if($('#show_hide_password input').attr("type") == "password"){
+            $('#show_hide_password input').attr('type', 'text');
+            $('#show_hide_password i').removeClass( "fa-eye-slash" );
+            $('#show_hide_password i').addClass( "fa-eye" );
+        }
+      });
+    })(jQuery);
   }
 
 }

@@ -30,7 +30,7 @@ const appRoutes: Routes = [
   {path: 'stats', component: StatsComponent, canActivate:[TokenVerificationService]},
   {path: 'signup', component: SignupComponent},
   {path: 'signin', component: SigninComponent},
-  {path: 'budget', component: BudgetComponent},
+  {path: 'budget', component: BudgetComponent, canActivate:[TokenVerificationService]},
   {path: 'reset-password/:id', component: ResetPasswordComponent},
   {path: '', redirectTo: 'signin', pathMatch: 'full'}
 ]

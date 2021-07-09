@@ -67,11 +67,11 @@ export class ApprovsService {
         (data: any[])=>{
           this.approvs = data;
           this.emitApprovsSubject();
-          console.log("reussite lors de la récuperation des approvs"+ data);
+          console.log("reussite lors de la récuperation des approvs");
           this.listApprovsItems();
         },
         (error)=>{
-          console.log("erreur lors de la récuperation des approvs" + error);
+          console.log("erreur lors de la récuperation des approvs");
         }
       );
   }
@@ -85,7 +85,7 @@ export class ApprovsService {
           console.log("reussite lors de la récuperation des approvs spécial");
         },
         (error)=>{
-          console.log("erreur lors de la récuperation des approvs spécial" + error);
+          console.log("erreur lors de la récuperation des approvs spécial");
         }
       );
   }
@@ -99,7 +99,7 @@ export class ApprovsService {
           console.log("reussite lors de la récuperation des approvs d'inferieurs");
         },
         (error)=>{
-          console.log("erreur lors de la récuperation des approvs d'inferieurs" + error);
+          console.log("erreur lors de la récuperation des approvs d'inferieurs");
         }
       );
   }
@@ -109,61 +109,17 @@ export class ApprovsService {
       .subscribe(
         (data)=>{
            this.listApprovs();
-           //this.listApprovsItems();
            this.listInferiorApprovs();
            this.listSpecialApprovs();
            this.getApprovStats();
            console.log("Réussite lors de l ajout d approv");
         },
         (error)=>{
-          console.log("Erreur lors de l ajout d approv"+ error);
+          console.log("Erreur lors de l ajout d approv");
         }
       );
   }
 
-
-  addDraft(draft){
-    this.httpClient.post<any[]>(environment.url + "addDraft/", draft)
-      .subscribe(
-        (data)=>{
-           this.listDraft();
-           console.log("Réussite lors de l ajout d un brouillon");
-        },
-        (error)=>{
-          console.log("Erreur lors de l ajout d un brouillon"+ error);
-        }
-      );
-  }
-
-  listDraft(){
-    this.httpClient.get(environment.url + "listDraft")
-      .subscribe(
-        (data: any[])=>{
-          this.draft = data;
-          this.emitDraftSubject();
-          this.listDraftItem();
-          console.log("reussite lors de la récuperation des brouillons");
-        },
-        (error)=>{
-          console.log("erreur lors de la récuperation des brouillons" + error);
-        }
-      );
-  }
-
-
-  listDraftItem(){
-    this.httpClient.get(environment.url + "listDraftItem/")
-      .subscribe(
-        (data: any[])=>{
-          this.draftItem = data;
-          this.emitDraftItemSubject();
-          console.log("reussite lors de la récuperation des items brouillons");
-        },
-        (error)=>{
-          console.log("erreur lors de la récuperation des items brouillons" + error);
-        }
-      );
-  }
 
 
   deleteApprov(id){
@@ -173,44 +129,28 @@ export class ApprovsService {
       .subscribe(
         (data)=>{
           this.listApprovs();
-          //this.listApprovsItems();
           this.listInferiorApprovs();
           this.listSpecialApprovs();
           this.getApprovStats();
           console.log("Réussite lors de la suppression d approv");
         },
         (error)=>{
-          console.log("Erreur lors de la suppression d approv"+ error);
+          console.log("Erreur lors de la suppression d approv");
         }
       );
     }
   }
 
-  deleteDraft(id){
-    this.p = confirm("Voulez-vous vraiment supprimer ?");
-    if(this.p){
-      this.httpClient.post<any[]>(environment.url + "deleteDraft/", {"id":id})
-      .subscribe(
-        (data)=>{
-          this.listDraft();
-          console.log("Réussite lors de la suppression du brouillon");
-        },
-        (error)=>{
-          console.log("Erreur lors de la suppression du brouillon"+ error);
-        }
-      );
-    }
-  }
+ 
 
 
-  lockApprov(id){
+  lockApprov(data){
     this.p = confirm("Voulez-vous vraiment fermer ce ticket ?");
     if(this.p){
-      this.httpClient.post<any[]>(environment.url + "lockapprov/", {"id":id})
+      this.httpClient.post<any[]>(environment.url + "lockapprov/", data)
       .subscribe(
         (data)=>{
           this.listApprovs();
-          //this.listApprovsItems();
           this.listInferiorApprovs();
           this.listSpecialApprovs();
           this.getApprovStats();
@@ -233,24 +173,12 @@ export class ApprovsService {
            console.log("reussite lors de la modification de l approv")
         },
         (error)=>{
-          console.log("Erreur lors de la modification de l approv"+ error);
+          console.log("Erreur lors de la modification de l approv");
         }
       );
   }
 
 
-  modifDraft(draft){
-    this.httpClient.post<any[]>(environment.url + "editDraft/", draft)
-      .subscribe(
-        (data)=>{
-           this.listDraft();
-           console.log("reussite lors de la modification du brouillon")
-        },
-        (error)=>{
-          console.log("Erreur lors de la modification du brouillon"+ error);
-        }
-      );
-  }
 
   decision(decision, id, message, role){
     let value={

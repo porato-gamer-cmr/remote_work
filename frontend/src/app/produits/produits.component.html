@@ -37,7 +37,9 @@
                       <i class="fa fa-pencil mr-3" data-toggle="modal" data-target="#editproduitform" (click)="infoProduits(produit)"></i>
                       <i class="fa fa-trash mr-3" (click)="deleteProduit(produit.id)"></i>
                     </td>
-  
+                  </tr>
+                  <tr class="row_table" *ngIf="produitsFilter.length==0">
+                    Aucun element
                   </tr>
                 </tbody>
             </table>

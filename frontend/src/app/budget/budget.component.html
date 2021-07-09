@@ -60,14 +60,6 @@
         </div>
         <div class="row">
           <div class="col">
-            <!-- <div *ngFor="let poste of posteFraisInvestissement_year; let index = index;">
-              <div (click)="updateVisibility(index)" class="item">
-                <b>{{ poste.name }} {{ poste.type }} {{ poste.year }} -- {{ poste.amount }}</b>
-                <i class="fa fa-pencil" data-toggle="modal" data-target="#editPosteBudget" style="float: right;" (click)="updateData(poste)"></i></div>
-              <div [hidden]="part1 != index" class="item1">
-                <div *ngFor="let ligne of tableauLigneBudget">{{ ligne.name }} {{ ligne.amount }}</div>
-              </div>
-            </div> -->
 
             <table class="table" *ngFor="let poste of posteFraisInvestissement_year; let index = index;">
               <tr (click)="updateVisibility(index)" style="background-color:#b8b8b8;">{{ poste.name }} -- {{ poste.amount }} <i class="fa fa-pencil" data-toggle="modal" data-target="#editPosteBudget" style="float: right;" (click)="updateData(poste)"></i></tr>

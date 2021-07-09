@@ -4,6 +4,8 @@ import { NgForm } from '@angular/forms';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
+declare  var jQuery:  any;
+
 
 @Component({
   selector: 'app-signin',
@@ -15,6 +17,7 @@ export class SigninComponent implements OnInit {
   isLogging: boolean = true;
   display = true;
   helper = new JwtHelperService();
+  @Input() message={ value:"", color:"" };
 
   constructor(private httpClient: HttpClient, private route: Router) { }
   ngOnInit(): void {
@@ -39,6 +42,27 @@ export class SigninComponent implements OnInit {
     
   }
 
+
+
+  hide_show(){
+    (function ($) {
+      $("#show_hide_password").on('click', function(event) {
+        event.preventDefault();
+        if($('#show_hide_password input').attr("type") == "text"){
+            $('#show_hide_password input').attr('type', 'password');
+            $('#show_hide_password i').addClass( "fa-eye-slash" );
+            $('#show_hide_password i').removeClass( "fa-eye" );
+         }
+         else if($('#show_hide_password input').attr("type") == "password"){
+            $('#show_hide_password input').attr('type', 'text');
+            $('#show_hide_password i').removeClass( "fa-eye-slash" );
+            $('#show_hide_password i').addClass( "fa-eye" );
+        }
+      });
+    })(jQuery);
+  }
+  
+
   passwordForget(value){
     if(value=='no'){
       this.display = !this.display;
@@ -52,8 +76,10 @@ export class SigninComponent implements OnInit {
   sendEmail(form: NgForm){
     this.httpClient.post("http://172.16.16.195:8000/stock/forgetPassword/", form.value.email).subscribe(
         (data)=>{
+          this.message = { value: "Verifiez votre boite mail, un lien de réinitialisation vous sera envoyé.", color: "green"}
         },
-        (error)=>{ console.log(error); }
+        (error)=>{ this.message = { value: "Une erreur a survenue lors de l'execution de votre requete.", color: "red"} 
+        }
       );
   }
   

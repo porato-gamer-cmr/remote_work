@@ -1,53 +1,48 @@
 from django.urls import path
-#from .API import views
-from . import views
-from . import ticket_approv
-from . import test_api
+from .views import auth
+from .views import produit
+from .views import budget
+from .views import approv
+from .views import ticket_approv
 
 urlpatterns = [
-    path('listproduits/', views.listproduits, name='1'),
-    path('addproduit/', views.addproduit, name='2'),
-    path('updateproduit/', views.updateproduit, name='3'),
-    path('deleteproduit/', views.deleteproduit, name='4'),
-    path('addapprov/', views.addapprov, name='5'),
-    path('modifapprov/', views.modifapprov, name='6'),
-    path('listapprovs/', views.listapprovs, name='7'),
-    path('decisionapprov/', views.decisionapprovs, name='8'),
-    path('signin/', views.login, name='9'),
-    path('signup/', views.signup, name='10'),
-    path('listuser', views.listuser, name='11'),
-    path('specialapprovs/', views.specialapprovs, name='12'),
-    path('listinferiorapprovs/', views.listinferiorapprovs, name='13'),
-    path('listapprovsitems/', views.listapprovsitems, name='14'),
-    path('deleteapprov/', views.deleteapprov, name='15'),
-    path('lockapprov/', views.lockapprov, name='26'),
-    path('addDraft/', views.addDraft, name='39'),
-    path('listDraft/', views.listDraft, name='40'),
-    path('listDraftItem/', views.listDraftItem, name='41'),
-    path('editDraft/', views.editDraft, name='42'),
-    path('deleteDraft/', views.deleteDraft, name='43'),
-    #ticket
-    path('listapprovsticketitems/', ticket_approv.listTicketApprovsItem, name='16'),
-    path('listapprovsticket/', ticket_approv.listTicketApprovs, name='17'),
-    path('personnalapprovsticket/', ticket_approv.listPersonnalTicketApprovs, name='18'),
-    path('addapprovticket/', ticket_approv.addTicketApprovs, name='19'),
-    path('deleteapprovticket/', ticket_approv.deleteTicketApprov, name='20'),
-    path('modifapprovticket/', ticket_approv.modifTicketApprov, name='21'),
-    path('decisionapprovticket/', ticket_approv.decisionTicketApprov, name='22'),
-    path('approvstats/', ticket_approv.approvStats, name='27'),
-    path('sendFile/', test_api.saveFile, name='28'),
-    path('send_file/', ticket_approv.send_file, name='35'),
+    #produits
+    path('listproduits/', produit.listproduits, name='1'),
+    path('addproduit/', produit.addproduit, name='2'),
+    path('updateproduit/', produit.updateproduit, name='3'),
+    path('deleteproduit/', produit.deleteproduit, name='4'),
+    #approvisionnement
+    path('addapprov/', approv.addapprov, name='5'),
+    path('modifapprov/', approv.modifapprov, name='6'),
+    path('listapprovs/', approv.listapprovs, name='7'),
+    path('decisionapprov/', approv.decisionapprovs, name='8'),
+    path('specialapprovs/', approv.specialapprovs, name='9'),
+    path('listinferiorapprovs/', approv.listinferiorapprovs, name='10'),
+    path('listapprovsitems/', approv.listapprovsitems, name='11'),
+    path('deleteapprov/', approv.deleteapprov, name='12'),
+    path('lockapprov/', approv.lockapprov, name='13'),
+    path('approvstats/', approv.approvStats, name='14'),
+    #authentification
+    path('signin/', auth.login, name='15'),
+    path('signup/', auth.signup, name='16'),
+    path('listuser', auth.listuser, name='17'),
+    path('changePassword/', auth.changePassword, name='18'),
+    path('forgetPassword/', auth.forgetPassword, name='19'),
+    path('resetPassword/', auth.resetPassword, name='20'),
+    #ticketApprovisionnement
+    path('listapprovsticketitems/', ticket_approv.listTicketApprovsItem, name='21'),
+    path('listapprovsticket/', ticket_approv.listTicketApprovs, name='22'),
+    path('personnalapprovsticket/', ticket_approv.listPersonnalTicketApprovs, name='23'),
+    path('addapprovticket/', ticket_approv.addTicketApprovs, name='24'),
+    path('deleteapprovticket/', ticket_approv.deleteTicketApprov, name='25'),
+    path('modifapprovticket/', ticket_approv.modifTicketApprov, name='26'),
+    path('decisionapprovticket/', ticket_approv.decisionTicketApprov, name='27'),
     #budget
-    path('newPoste/', ticket_approv.newPoste, name='29'),
-    path('editPoste/', ticket_approv.editPoste, name='30'),
-    path('allPosteFonctionnement/', ticket_approv.listePosteFonctionnement, name='31'),
-    path('allLigneFonctionnement/', ticket_approv.listeLigneFonctionnement, name='32'),
-    path('allPosteInvestissement/', ticket_approv.listePosteInvestissement, name='33'),
-    path('allLigneInvestissement/', ticket_approv.listeLigneInvestissement, name='34'),
-    path('changePassword/', views.changePassword, name='36'),
-    path('forgetPassword/', views.forgetPassword, name='37'),
-    path('resetPassword/', views.resetPassword, name='38')
-    
-    
+    path('newPoste/', budget.newPoste, name='28'),
+    path('editPoste/', budget.editPoste, name='29'),
+    path('allPosteFonctionnement/', budget.listePosteFonctionnement, name='30'),
+    path('allLigneFonctionnement/', budget.listeLigneFonctionnement, name='31'),
+    path('allPosteInvestissement/', budget.listePosteInvestissement, name='32'),
+    path('allLigneInvestissement/', budget.listeLigneInvestissement, name='32'),
 
 ]

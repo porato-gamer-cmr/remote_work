@@ -7,8 +7,10 @@ import { ProduitsService } from '../_services/produits.service';
 import { Router } from '@angular/router';
 import { TicketApprovService } from '../_services/ticket-approv.service';
 import jwt_token from 'jwt-decode';
-import { environment } from 'src/environments/environment';
 declare  var jQuery:  any;
+import { environment } from 'src/environments/environment';
+import { timer } from 'rxjs';
+
 
 
 @Component({
@@ -17,8 +19,9 @@ declare  var jQuery:  any;
   styleUrls: ['./approv.component.css']
 })
 export class ApprovComponent implements OnInit {
+  hasInferior:boolean;
   display:boolean;
-
+  @Input() name;
   @Input() ticketApprovs=[];
   @Input() personnalTicketApprovs=[];
   @Input() ticketApprovsItems=[];
@@ -28,8 +31,10 @@ export class ApprovComponent implements OnInit {
   @Input() otherApprovs=[];
   @Input() specialApprovs=[];
   @Input() id;
-  @Input() approvStats={all: 0, success: 0, reject: 0, waiting: 0, cancel: 0 };
   @Input() libelle;
+  @Input() isDraft;
+  @Input() approvStats={all: 0, success: 0, reject: 0, waiting: 0, draft: 0, cancel: 0 };
+  
 
   @Input() allApprovsItems=[];
   @Input() new_produit;
@@ -52,12 +57,28 @@ export class ApprovComponent implements OnInit {
   approvStatsSubscription: Subscription;
   ticketApprovsItemsSubscription = new Subscription;
   ticketApprovsSubscription: Subscription;
-  role=jwt_token(window.localStorage.getItem("token"));
-
+  role;
+  connexionData=jwt_token(window.localStorage.getItem("token"));
+  subscription: Subscription;
+  statusText: number;
 
   constructor(private route: Router, private approvsService: ApprovsService, private produitsService: ProduitsService, private httpClient: HttpClient, private ticketApprovsService: TicketApprovService) { }
   ngOnInit(): void {
-    this.role = this.role['role'];    
+
+    this.subscription = timer(0, 300000).subscribe(() => {
+      this.ticketApprovsService.listPersonnalTicketApprovs();
+      this.ticketApprovsService.listTicketApprovs();
+      this.ticketApprovsService.listTicketApprovsItems();
+      this.approvsService.listApprovs();
+      this.approvsService.listInferiorApprovs();
+      this.approvsService.listApprovsItems(); 
+      this.approvsService.listSpecialApprovs();
+      this.approvsService.getApprovStats();
+      this.produitsService.listProduits();
+    });
+
+    this.role = this.connexionData['role'];
+    this.hasInferior = this.connexionData['hasInferior'];   
     this.ticketApprovsService.listPersonnalTicketApprovs();
     this.ticketApprovsService.listTicketApprovs();
     this.ticketApprovsService.listTicketApprovsItems();
@@ -66,8 +87,6 @@ export class ApprovComponent implements OnInit {
     this.approvsService.listApprovsItems();
     this.approvsService.listSpecialApprovs();
     this.approvsService.getApprovStats();
-    this.approvsService.listDraftItem();
-    this.approvsService.listDraft();
     this.produitsService.listProduits();
     this.produitsSubscription = this.produitsService.produitsSubject.subscribe(
       (data)=>{this.produits = data;}
@@ -79,6 +98,7 @@ export class ApprovComponent implements OnInit {
           success: data['success'],
           reject: data['reject'],
           waiting: data['waiting'],
+          draft: data['draft'],
           cancel: data['cancel']
         } 
       }
@@ -155,14 +175,8 @@ export class ApprovComponent implements OnInit {
  
 
   addApprov(type){
-    
     if(this.listproduits.length>0){
-      if(type=='save'){
-        this.approvsService.addDraft({listproduits: this.listproduits, libelle: this.libelle});
-      }else{
-        this.approvsService.addDraft({listproduits: this.listproduits, libelle: this.libelle});
-        this.approvsService.addApprov({listproduits: this.listproduits, libelle: this.libelle});
-      }
+        this.approvsService.addApprov({listproduits: this.listproduits, libelle: this.libelle, type: type});
     }
     this.closeModal();
   }
@@ -188,17 +202,17 @@ export class ApprovComponent implements OnInit {
   deleteapprov(id){
     this.approvsService.deleteApprov(id);
   }
-  deletedraft(id){
-    this.approvsService.deleteDraft(id);
-  }
+  
   lockapprov(id){
     let p = confirm("voulez-vous vraiment fermer cet approvisionnement ?");
-    if(p){this.approvsService.lockApprov(id);}
+    if(p){
+      let message=prompt("Pourqoi cloturez-vous cet approv?");
+      this.approvsService.lockApprov({id:id, message:message});}
   }
 
   updateListProd(){
     let p = false;
-    //if(this.new_produit && this.quantity)
+    if(this.new_produit && this.quantity){
     for(let i=0; i<this.listproduits.length; i++){
       if(this.listproduits[i].product===this.new_produit){
         p=true;
@@ -206,16 +220,15 @@ export class ApprovComponent implements OnInit {
         this.listproduitsSubject.next(this.listproduits.slice());
       }
     }
-    
-   let produit ={
-      quantity: this.quantity,
-      product: this.new_produit,
-    } 
-    
-  if(!p){
-    this.listproduits.push(produit);
-    this.listproduitsSubject.next(this.listproduits.slice());
-  } 
+    if(!p){
+        this.listproduits.push({
+          quantity: this.quantity,
+          product: this.new_produit,
+        });
+        this.listproduitsSubject.next(this.listproduits.slice());
+      } 
+
+  }
         
   }
 
@@ -260,6 +273,7 @@ export class ApprovComponent implements OnInit {
   infoApprovs(elt, type){
     this.id=elt.id;
     this.libelle = elt.libelle;
+    this.isDraft = elt.isDraft;
     if(type=='ticket'){
       let liste=[];
       this.listproduits = this.allApprovsItems.filter(approv=>approv.approv==elt.id);
@@ -269,13 +283,11 @@ export class ApprovComponent implements OnInit {
           product: this.listproduits[i].product,
           quantity: this.listproduits[i].quantity,
           waitingquantity: this.produits.find(p=>p.name==this.listproduits[i].product)['waitingquantity'],
-          send: 0
+          send: 0,
+          reste: this.listproduits[i].reste
         };
       }
       this.listproduits = liste;
-    }
-    else if(type=='draft'){
-      this.listproduits = this.draftItem.filter(draft=>draft.draft==elt.id);
     }
     else{
       this.listproduits = this.allApprovsItems.filter(approv=>approv.approv==elt.id);
@@ -309,31 +321,40 @@ export class ApprovComponent implements OnInit {
 
 
   modifApprovs(){
-    if(this.listproduits.length>0){this.approvsService.modifApprovs({listproduits: this.listproduits, id: this.id, libelle: this.libelle});}
+    if(this.listproduits.length>0){this.approvsService.modifApprovs({listproduits: this.listproduits, id: this.id, libelle: this.libelle, isDraft: this.isDraft});}
     this.closeModal();
   }
 
-  modifDraft(){
-    if(this.listproduits.length>0){this.approvsService.modifDraft({listproduits: this.listproduits, id: this.id, libelle: this.libelle});}
-    this.closeModal();
-  }
   
   sendCoupon(){
     let isCorrect = true;
+    let isTotal = true;
     for(let i=0; i<this.listproduits.length; i++){
       this.listproduits[i]['send'] = parseInt(document.getElementsByClassName('send_value')[i]['value']);
       this.listproduitsSubject.next(this.listproduits.slice());
     }
     if(this.listproduits.length>0){
       for(let i=0; i<this.listproduits.length; i++){
-        if(this.listproduits[i]['send']>this.listproduits[i]['waitingquantity'] || this.listproduits[i]['send']>this.listproduits[i]['quantity']){  
+        if(this.listproduits[i]['send']>this.listproduits[i]['waitingquantity'] || this.listproduits[i]['send']>(this.listproduits[i]['quantity']-this.listproduits[i]['alreadysend'])){  
           isCorrect = false;
           (document.getElementsByClassName('send_value')[i]).setAttribute("style", "background-color:orange;")
         }
+        else if(this.listproduits[i]['send'] != this.listproduits[i]['quantity']){
+          isTotal = false;
+        }
       }
-      if(isCorrect){ 
-        this.ticketApprovsService.addApprovTicket({listproduits: this.listproduits}); 
-        this.closeModal();}
+      if(isCorrect && isTotal){ 
+        this.ticketApprovsService.addApprovTicket({listproduits: this.listproduits, message: " "}); 
+        this.closeModal(); }
+      else if(!isTotal && isCorrect){
+        let p = prompt("Quelle est la raison de cete livraison partielle");
+        console.log(p)
+        while(p == null){
+          p = prompt("Quelle est la raison de cete livraison partielle");
+        }
+        this.ticketApprovsService.addApprovTicket({listproduits: this.listproduits, message: p}); 
+        this.closeModal();
+      }
       
     }
     
@@ -353,7 +374,7 @@ export class ApprovComponent implements OnInit {
         }
       }
       if(isCorrect){ 
-        this.ticketApprovsService.modifTicketApprovs({listproduits: this.listproduits}); 
+        this.ticketApprovsService.modifTicketApprovs({listproduits: this.listproduits, message: ''}); 
         this.closeModal();}
       
     }
@@ -361,7 +382,7 @@ export class ApprovComponent implements OnInit {
 
   changeValue(index){
     let value = parseInt(document.getElementsByClassName('send_value')[index]['value']);
-    if(value > this.listproduits[index]['quantity'] || value > this.listproduits[index]['waitingquantity']){
+    if(value > (this.listproduits[index]['quantity']-this.listproduits[index]['alreadysend']) || value > this.listproduits[index]['waitingquantity']){
       (document.getElementsByClassName('send_value')[index]).setAttribute("style", "background-color:orange;");
     }else{
       (document.getElementsByClassName('send_value')[index]).setAttribute("style", "background-color:white;");      
@@ -370,7 +391,7 @@ export class ApprovComponent implements OnInit {
 
   changeValue1(index, property){
     let value = parseInt(document.getElementsByClassName('send_value1')[index]['value']);
-    if(value > this.listproduits[index]['initialquantity']){
+    if(value > this.listproduits[index]['sendquantity']){
       (document.getElementsByClassName('send_value1')[index]).setAttribute("style", "background-color:orange;")
     }else{
       (document.getElementsByClassName('send_value1')[index]).setAttribute("style", "background-color:white;")
@@ -383,11 +404,17 @@ export class ApprovComponent implements OnInit {
     
   }
 
-  modif_Save_Draft(){
-    if(this.listproduits.length>0){
-      this.approvsService.modifDraft({listproduits: this.listproduits, id: this.id, libelle: this.libelle});
-      this.approvsService.addApprov({listproduits: this.listproduits, id: this.id, libelle: this.libelle});
-    }
-    this.closeModal();
+
+  orderBy(){
+    this.httpClient.get(environment.url + "listapprovs1")
+      .subscribe(
+        (data: any[])=>{
+          this.approvs = data;
+          console.log('reussite');
+        },
+        (error)=>{
+          console.log('echec');
+        }
+      );
   }
 }

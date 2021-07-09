@@ -89,7 +89,7 @@ WSGI_APPLICATION = 'suivi_budgetaire.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'suivi2306',
+        'NAME': 'suivi0907',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         'HOST': '127.0.0.1',

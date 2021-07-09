@@ -11,10 +11,11 @@ import jwt_token from 'jwt-decode';
 export class ContainerComponent implements OnInit {
   constructor(private route: Router) { }
   role;
+  name;
   ngOnInit(): void {
     let data=jwt_token(window.localStorage.getItem("token"))
-    console.log(data['role']);
     this.role=data['role'];
+    this.name = data['name'] 
   }
 
   logOut(){

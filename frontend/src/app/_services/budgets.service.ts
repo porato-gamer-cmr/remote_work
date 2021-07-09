@@ -12,10 +12,13 @@ export class BudgetsService {
   posteFraisInvestissement: any[];
   ligneFraisFonctionnement: any[];
   ligneFraisInvestissement: any[];
+  bonCommande: any[];
+  bonCommandeItem: any[];
   subjectLigneFraisInvestissement = new Subject<any[]>();
   subjectPosteFraisInvestissement = new Subject<any[]>();
   subjectLigneFraisFonctionnement = new Subject<any[]>();
   subjectPosteFraisFonctionnement = new Subject<any[]>();
+  subjectBonCommande = new Subject<any[]>();
 
   constructor(private httpClient: HttpClient) { }
 
@@ -31,7 +34,9 @@ export class BudgetsService {
   emitLigneFraisInvestissement(){
     this.subjectLigneFraisInvestissement.next(this.ligneFraisInvestissement.slice());
   }
-
+  emitBonCommande(){
+    this.subjectBonCommande.next(this.bonCommande.slice());
+  }
 
   listePosteFraisFonctionnement(){
     this.httpClient.get(environment.url+"allPosteFonctionnement/").subscribe(
@@ -92,6 +97,26 @@ export class BudgetsService {
       this.listePosteFraisFonctionnement();
       this.listeLigneFraisFonctionnement();
     }
+  }
+
+
+  addBonCommande(bonCommande){
+    this.httpClient.post(environment.url+"addBonCommande/", bonCommande).subscribe(
+      (data)=>{
+        this.listBonCommande();
+      },
+      (error)=>{}
+    );
+  }
+
+  listBonCommande(){
+    this.httpClient.get(environment.url+"listBonCommande/").subscribe(
+      (data: any[])=>{
+        this.bonCommande = data;
+        this.emitBonCommande();
+      },
+      (error)=>{}
+    );
   }
 
 

@@ -1,6 +1,7 @@
 <div class="container-fluid">
     <div class="row my-5" *ngIf="display">
         <div class="col mt-3 col-12 col-md-9 col-lg-5 mx-auto">
+            <!-- <img class="mb-3 ml-5" src="assets/logo.png"> -->
             <div class="card my-4 my-lg-0">
                 <div class="card-header">Connexion</div>
                 <form (ngSubmit)="signin(f)" #f="ngForm">
@@ -12,7 +13,12 @@
                                 <i class="fa fa-user text-muted"></i>
                             </span>
                         </div>
-                        <input id="name" type="email" name="courriel" placeholder="courriel" class="form-control bg-white" ngModel autocomplete="off">
+                        <input id="name" type="text" name="courriel" placeholder="courriel" class="form-control bg-white" ngModel autocomplete="off">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white px-4 border-left-0">
+                                @sunu-group.com
+                            </span>
+                        </div>
                     </div>
                     <label for="password">Mot de Passe</label>
                     <div class="input-group mb-4" id="show_hide_password">
@@ -23,6 +29,7 @@
                         <input id="password" type="password" name="password" placeholder="mot de passe" class="form-control bg-white border-right-0" ngModel>
                         <div class="input-group-prepend">
                             <span class="input-group-text bg-white px-4 border-left-0">
+                                <i class="fa fa-eye-slash text-muted" style="cursor: pointer;" (click)="hide_show()"></i>
                             </span>
                         </div>
                     </div>
@@ -56,8 +63,7 @@
                 </form>
             </div>
             <div class="card-body">
-                Verifiez votre boite mail, un lien de réinitialisation vous sera envoyé.
-                Retouner à la page de connexion
+                <i>{{ message.value }}</i> <br>
             </div>
         </div>
     </div>

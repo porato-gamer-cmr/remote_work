@@ -32,38 +32,69 @@ def lockapprov(request):
 
 @csrf_exempt
 def addapprov(request):
-    my_json = json.loads((request.body).decode('utf-8'))
+    data = json.loads((request.body).decode('utf-8'))
     payload = tokenVerification(request.headers['Authorization'].split(' ')[1])
-    if(my_json['type']=='send'):
-        #infoItem help to know if approv content an IT product
-        infoItem = False
-        for item in my_json['listproduits']:
-            if(Product.objects.get(name=item['product']).type == "informatique"):
-                infoItem = True
-        
-        if(infoItem & bool(User.objects.get(id=payload['user_id']).higher) ):
-            approv = Approv.objects.create(user=User.objects.get(id=payload['user_id']), higherDecision=0, infoDecision=0, message="", libelle=my_json['libelle'])
-            print(" jai besoin des deux")
-        elif(infoItem & ~bool(User.objects.get(id=payload['user_id']).higher) ):
-            approv = Approv.objects.create(user=User.objects.get(id=payload['user_id']), higherDecision=1, infoDecision=0, message="", libelle=my_json['libelle'])
-            print("jai besoin de informatique")
-        elif(~infoItem & bool(User.objects.get(id=payload['user_id']).higher) ):
-            approv = Approv.objects.create(user=User.objects.get(id=payload['user_id']), higherDecision=0, infoDecision=1, message="", libelle=my_json['libelle'])
-            print("jai besoin de mon chef")
+    if data['type']=='send' and data['nature']=='simple':
+        if(bool(User.objects.get(id=payload['user_id']).higher) ):
+            approv = Approv.objects.create(user=User.objects.get(id=payload['user_id']), higherDecision=0, infoDecision=1, message="", libelle=data['libelle'])
+            print('bonjour')
         else:
-            approv = Approv.objects.create(user=User.objects.get(id=payload['user_id']), higherDecision=1, infoDecision=1, message="", libelle=my_json['libelle'])
-            print("jai besoin de personne sur terre")
-        approv.save()
+            approv = Approv.objects.create(user=User.objects.get(id=payload['user_id']), higherDecision=1, infoDecision=1, message="", libelle=data['libelle'])
+            print("bonjour")
+        for item in data['listproduits']:
+            ApprovItem.objects.create(product=Product.objects.get(name=item["product"]), quantity=item["quantity"], approv=approv)
+    
+    elif(data['type']=='send' and data['nature']=="informatique"):
+        if(bool(User.objects.get(id=payload['user_id']).higher) ):
+            approv = Approv.objects.create(user=User.objects.get(id=payload['user_id']), higherDecision=0, infoDecision=0, message="", libelle=data['libelle'])
+        else:
+            approv = Approv.objects.create(user=User.objects.get(id=payload['user_id']), higherDecision=1, infoDecision=0, message="", libelle=data['libelle'])
 
-        for item in my_json['listproduits']:
-            approvItem = ApprovItem(product=Product.objects.get(name=item["product"]), quantity=item["quantity"], approv=approv) 
-            approvItem.save()
-    else:
-        approv = Approv.objects.create(user=User.objects.get(id=payload['user_id']), libelle=my_json['libelle'], higherDecision=-1, infoDecision=-1, message="")
-        for item in my_json['listproduits']:
+        for item in data['listproduits']:
             ApprovItem.objects.create(product=Product.objects.get(name=item["product"]), quantity=item["quantity"], approv=approv) 
+    else:
+        approv = Approv.objects.create(user=User.objects.get(id=payload['user_id']), libelle=data['libelle'], higherDecision=-1, infoDecision=-1, message="")
+        for item in data['listproduits']:
+            ApprovItem.objects.create(product=Product.objects.get(name=item["product"]), quantity=item["quantity"], approv=approv)
 
     return JsonResponse({'message': 'Enregistrement reussi' })
+
+
+
+@csrf_exempt
+def modifapprov(request):
+    data = json.loads((request.body).decode('utf-8'))
+    payload = tokenVerification(request.headers['Authorization'].split(' ')[1])
+    if(data['nature']=='approv'):
+        infoItem = False
+        for a in data['listproduits']:
+            if(Product.objects.get(name=a['product']).type == "informatique"):
+                infoItem = True
+                break
+
+        if(infoItem & bool(User.objects.get(id=payload['user_id']).higher) ):
+            Approv.objects.filter(id=data['id']).update(infoDecision=0, libelle=data['libelle'], higherDecision=0, instant=datetime.now())
+        elif(infoItem & ~bool(User.objects.get(id=payload['user_id']).higher) ):
+            Approv.objects.filter(id=data['id']).update(infoDecision=0, libelle=data['libelle'], higherDecision=1, instant=datetime.now())
+        elif(~infoItem & bool(User.objects.get(id=payload['user_id']).higher)):
+            Approv.objects.filter(id=data['id']).update(infoDecision=1, libelle=data['libelle'], higherDecision=0, instant=datetime.now())
+        elif(~infoItem & ~bool(User.objects.get(id=payload['user_id']).higher)):
+            Approv.objects.filter(id=data['id']).update(infoDecision=1, libelle=data['libelle'], higherDecision=1, instant=datetime.now())
+
+        approv = Approv.objects.get(id=data['id'])
+        ApprovItem.objects.filter(approv=data['id']).delete()
+        for a in data['listproduits']:
+            ApprovItem.objects.create(product=Product.objects.get(name=a["product"]), quantity=a["quantity"], approv=approv) 
+            print("Well done")
+    
+    else:
+        approv = Approv.objects.get(id=data['id'])
+        Approv.objects.filter(id=data['id']).update(libelle=data['libelle'], instant=datetime.now())
+        ApprovItem.objects.filter(approv=data['id']).delete()
+        for a in data['listproduits']:
+            ApprovItem.objects.create(product=Product.objects.get(name=a["product"]), quantity=a["quantity"], approv=approv)
+    return JsonResponse({'message': 'Enregistrement reussi' })
+
 
 
 @csrf_exempt
@@ -85,7 +116,8 @@ def listapprovs(request):
                 isFinished = False
         if (isFinished == False):
             approvs.append(item)
-    return JsonResponse([app.serializable() for app in approvs],  safe=False)
+    return JsonResponse([app.serializable() for app in appr],  safe=False)
+    #return JsonResponse([app.serializable() for app in approvs],  safe=False)
 
 
 @csrf_exempt
@@ -94,30 +126,6 @@ def listinferiorapprovs(request):
     approv = Approv.objects.filter(user__higher__id=payload['user_id'], state=False)
     return JsonResponse([app.serializable() for app in approv],  safe=False)
        
-
-
-@csrf_exempt
-def modifapprov(request):
-    if request.method == 'POST':
-        data = json.loads((request.body).decode('utf-8'))
-        payload = tokenVerification(request.headers['Authorization'].split(' ')[1])
-        infoItem = False
-        for a in data['listproduits']:
-            if(Product.objects.get(name=a['product']).type == "informatique"):
-                infoItem = True
-                break
-        if(infoItem & ~data["isDraft"]):
-            Approv.objects.filter(id=data['id']).update(infoDecision=0, libelle=data['libelle'], higherDecision=0, instant=datetime.now())
-        elif(infoItem & ~data["isDraft"]):
-            Approv.objects.filter(id=data['id']).update(infoDecision=1, libelle=data['libelle'], higherDecision=0, instant=datetime.now())
-        else:
-            Approv.objects.filter(id=data['id']).update(libelle=data['libelle'], instant=datetime.now())
-        approv = Approv.objects.get(id=data['id'])
-        ApprovItem.objects.filter(approv=data['id']).delete()
-        for a in data['listproduits']:
-            ApprovItem.objects.create(product=Product.objects.get(name=a["product"]), quantity=a["quantity"], approv=approv) 
-    return JsonResponse({'message': 'Enregistrement reussi' })
-
 
 
 @csrf_exempt

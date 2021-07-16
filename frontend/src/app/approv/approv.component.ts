@@ -22,6 +22,7 @@ export class ApprovComponent implements OnInit {
   hasInferior:boolean;
   display:boolean;
   @Input() name;
+  @Input() nature = "simple";
   @Input() ticketApprovs=[];
   @Input() personnalTicketApprovs=[];
   @Input() ticketApprovsItems=[];
@@ -40,6 +41,7 @@ export class ApprovComponent implements OnInit {
   @Input() new_produit;
   @Input() quantity;
   @Input() produits=[];
+  @Input() produitsFilter=[];
   @Input() e;
   @Input() message;
   listproduits=[];
@@ -89,7 +91,7 @@ export class ApprovComponent implements OnInit {
     this.approvsService.getApprovStats();
     this.produitsService.listProduits();
     this.produitsSubscription = this.produitsService.produitsSubject.subscribe(
-      (data)=>{this.produits = data;}
+      (data)=>{this.produits = data;this.produitsFilter = this.produits.filter(item=>item.type==this.nature);}
     )
     this.approvStatsSubscription = this.approvsService.approvstatsSubject.subscribe(
       (data)=>{
@@ -176,7 +178,7 @@ export class ApprovComponent implements OnInit {
 
   addApprov(type){
     if(this.listproduits.length>0){
-        this.approvsService.addApprov({listproduits: this.listproduits, libelle: this.libelle, type: type});
+        this.approvsService.addApprov({listproduits: this.listproduits, libelle: this.libelle, type: type, nature: this.nature});
     }
     this.closeModal();
   }
@@ -297,7 +299,18 @@ export class ApprovComponent implements OnInit {
 
   infoTicketApprovs(id){
     this.id=id;
+    let liste = [];
     this.listproduits = this.ticketApprovsItems.filter(ticket=>ticket.ticketapprov==id);
+    for(let i=0; i<this.listproduits.length; i++){
+      liste[i]={
+        product: this.listproduits[i].product,
+        initialquantity: this.listproduits[i].initialquantity,
+        waitingquantity: this.produits.find(p=>p.name==this.listproduits[i].product)['waitingquantity'],
+        sendquantity: this.listproduits[i].sendquantity,
+        reste: this.listproduits[i].reste
+      };
+    }
+    this.listproduits = liste;
   }
 
   listTicketApprov(id){
@@ -320,8 +333,8 @@ export class ApprovComponent implements OnInit {
   }
 
 
-  modifApprovs(){
-    if(this.listproduits.length>0){this.approvsService.modifApprovs({listproduits: this.listproduits, id: this.id, libelle: this.libelle, isDraft: this.isDraft});}
+  modifApprovs(nature){
+    if(this.listproduits.length>0){this.approvsService.modifApprovs({listproduits: this.listproduits, id: this.id, libelle: this.libelle, nature: nature});}
     this.closeModal();
   }
 
@@ -416,5 +429,11 @@ export class ApprovComponent implements OnInit {
           console.log('echec');
         }
       );
+  }
+
+
+  changeType(){
+    this.produitsFilter = this.produits.filter(item=>item.type==this.nature);
+    this.listproduits = [];
   }
 }

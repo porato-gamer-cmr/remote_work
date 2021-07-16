@@ -11,7 +11,7 @@ declare  var jQuery:  any;
 export class ProduitsComponent implements OnInit, OnDestroy {
 
   produits;
-  produitsFilter: any[];
+  produitsFilter=[];
   produitsSubscription: Subscription;
   produitsFilterSubscription: Subscription;
   @Input() name;

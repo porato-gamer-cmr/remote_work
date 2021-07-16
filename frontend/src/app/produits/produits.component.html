@@ -1,51 +1,120 @@
-<app-container></app-container>
-
 <div class="card">
-    <div class="row">
-      <div class="col">
-        <button class="btn btn-success" data-toggle="modal" data-target="#createproduitform"><i class="fa fa-user-plus"></i></button>
-        <button class="btn btn-success" data-toggle="modal" data-target="#"><i class="fa fa-upload"></i></button>
-        <button class="btn btn-success"><i class="fa fa-download"></i></button>
-      </div>
-      <div class="col">
-          <input class="input_search" placeholder="search" name="search" [(ngModel)]="e" (keyup)="searchProduit()" autocomplete="off">
-      </div>
-    </div>
-    <div class="row" id="tableau">
+
+  <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="produits-tab" data-toggle="tab" href="#produits" role="tab" aria-controls="produits" aria-selected="true">Produits</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="services-tab" data-toggle="tab" href="#services" role="tab" aria-controls="services" aria-selected="false">Services</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="fournisseurs-tab" data-toggle="tab" href="#fournisseurs" role="tab" aria-controls="fournisseurs" aria-selected="false">Fournisseurs</a>
+    </li>
+  </ul>
+  <div class="tab-content" id="myTabContent">
+
+    <div class="tab-pane fade show active" id="produits" role="tabpanel" aria-labelledby="produits-tab">
+      <div class="row">
         <div class="col">
-            <table class="table table-bordered">
-                <thead>
-                  <tr class="first_row_table">
-                    <th>Nom</th>
-                    <th>Quantite</th>
-                    <th>QuantitePro</th>
-                    <th>Seuil Securite</th>
-                    <th>Alerte</th>
-                    <th>Type</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr class="row_table" *ngFor="let produit of produitsFilter; let index=index;">
-                    <td>{{ produit.name }}</td>
-                    <td>{{ produit.quantity }}</td>
-                    <td>{{ produit.waitingquantity }}</td>
-                    <td>{{ produit.security }}</td>
-                    <td>{{ produit.warning }}</td>
-                    <td>{{ produit.type }}</td>
-                    <td>
-                      <i class="fa fa-pencil mr-3" data-toggle="modal" data-target="#editproduitform" (click)="infoProduits(produit)"></i>
-                      <i class="fa fa-trash mr-3" (click)="deleteProduit(produit.id)"></i>
-                    </td>
-                  </tr>
-                  <tr class="row_table" *ngIf="produitsFilter.length==0">
-                    Aucun element
-                  </tr>
-                </tbody>
-            </table>
+          <button class="btn btn-success" data-toggle="modal" data-target="#createproduitform"><i class="fa fa-user-plus"></i></button>
+          <button class="btn btn-success" data-toggle="modal" data-target="#"><i class="fa fa-upload"></i></button>
+          <button class="btn btn-success"><i class="fa fa-download"></i></button>
         </div>
+        <div class="col">
+            <input class="input_search" placeholder="search" name="search" [(ngModel)]="e" (keyup)="searchProduit()" autocomplete="off">
+        </div>
+      </div>
+      <div class="row" id="tableau">
+        <div class="col">
+          <table class="table table-bordered">
+            <thead>
+              <tr class="first_row_table">
+                <th>Nom</th>
+                <th>Quantite</th>
+                <th>QuantitePro</th>
+                <th>Seuil Securite</th>
+                <th>Alerte</th>
+                <th>Type</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="row_table" *ngFor="let produit of produitsFilter; let index=index;">
+                <td>{{ produit.name }}</td>
+                <td>{{ produit.quantity }}</td>
+                <td>{{ produit.waitingquantity }}</td>
+                <td>{{ produit.security }}</td>
+                <td>{{ produit.warning }}</td>
+                <td>{{ produit.type }}</td>
+                <td>
+                  <i class="fa fa-pencil mr-3" data-toggle="modal" data-target="#editproduitform" (click)="infoProduits(produit)"></i>
+                  <i class="fa fa-trash mr-3" (click)="deleteProduit(produit.id)"></i>
+                </td>
+              </tr>
+              <tr class="row_table" *ngIf="produitsFilter.length==0">
+                Aucun element
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-    
+
+    <div class="tab-pane fade" id="services" role="tabpanel" aria-labelledby="services-tab">
+      <div class="row">
+        <div class="col">
+          <button class="btn btn-success" data-toggle="modal" data-target="#createserviceform"><i class="fa fa-user-plus"></i></button>
+          <button class="btn btn-success" data-toggle="modal" data-target="#"><i class="fa fa-upload"></i></button>
+          <button class="btn btn-success"><i class="fa fa-download"></i></button>
+        </div>
+        <div class="col">
+            <input class="input_search" placeholder="search" name="search" [(ngModel)]="e" (keyup)="searchProduit()" autocomplete="off">
+        </div>
+      </div>
+      <div class="row" id="tableau">
+        <div class="col">
+          <table class="table table-bordered">
+            <thead>
+              <tr class="first_row_table">
+                <th>Nom</th>
+                <th>Quantite</th>
+                <th>QuantitePro</th>
+                <th>Seuil Securite</th>
+                <th>Alerte</th>
+                <th>Type</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="row_table" *ngFor="let produit of produitsFilter; let index=index;">
+                <td>{{ produit.name }}</td>
+                <td>{{ produit.quantity }}</td>
+                <td>{{ produit.waitingquantity }}</td>
+                <td>{{ produit.security }}</td>
+                <td>{{ produit.warning }}</td>
+                <td>{{ produit.type }}</td>
+                <td>
+                  <i class="fa fa-pencil mr-3" data-toggle="modal" data-target="#editproduitform" (click)="infoProduits(produit)"></i>
+                  <i class="fa fa-trash mr-3" (click)="deleteProduit(produit.id)"></i>
+                </td>
+              </tr>
+              <tr class="row_table" *ngIf="produitsFilter.length==0">
+                Aucun element
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-pane fade" id="fournisseurs" role="tabpanel" aria-labelledby="fournisseurs-tab">d</div>
+  </div>
+
+</div>
+
+
+
+
 
 <!--Start Edit Product -->
 <div class="modal" id="editproduitform">
@@ -93,50 +162,48 @@
 </div>
 <!-- End Edit Product-->
 
-    
-  <!--Start Create Produit-->
-  <div class="modal" id="createproduitform">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Ajouter Produit</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form (ngSubmit)="addProduit(f)" #f="ngForm">
-                <div class="row mb-1">
-                  <div class="col col-4">Nom</div>
-                  <div class="col"><input type="text" class="form-control border-secondary" name="name" autocomplete="off" required ngModel></div>
-                </div>
-                <div class="row mb-1">
-                  <div class="col col-4">Quantite</div>
-                  <div class="col"><input type="number" class="form-control border-secondary" name="quantity" autocomplete="off" required ngModel></div>
-                </div>
-                <div class="row mb-1">
-                  <div class="col col-4">Sécurite</div>
-                  <div class="col"><input type="number" class="form-control border-secondary" name="security" autocomplete="off" required ngModel></div>
-                </div>
-                <div class="row mb-1">
-                    <div class="col col-4">Alerte</div>
-                    <div class="col"><input type="number" class="form-control border-secondary" name="warning" autocomplete="off" required ngModel></div>
-                </div>
-                <div class="row mb-1">
-                  <div class="col col-4">Type</div>
-                  <div class="col">
-                    <select class="form-select" name="type" autocomplete="off" ngModel>
-                      <option value="informatique">Informatique</option>
-                      <option value="simple"> Simple</option>
-                    </select>
-                  </div>
-                </div>
-                <button class="btn btn-primary" type="submit">OK</button>
-          </form>
-        </div>
-          
+<!--Start Create Produit-->
+<div class="modal" id="createproduitform">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Ajouter Produit</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
+      <div class="modal-body">
+        <form (ngSubmit)="addProduit(f)" #f="ngForm">
+              <div class="row mb-1">
+                <div class="col col-4">Nom</div>
+                <div class="col"><input type="text" class="form-control border-secondary" name="name" autocomplete="off" required ngModel></div>
+              </div>
+              <div class="row mb-1">
+                <div class="col col-4">Quantite</div>
+                <div class="col"><input type="number" class="form-control border-secondary" name="quantity" autocomplete="off" required ngModel></div>
+              </div>
+              <div class="row mb-1">
+                <div class="col col-4">Sécurite</div>
+                <div class="col"><input type="number" class="form-control border-secondary" name="security" autocomplete="off" required ngModel></div>
+              </div>
+              <div class="row mb-1">
+                  <div class="col col-4">Alerte</div>
+                  <div class="col"><input type="number" class="form-control border-secondary" name="warning" autocomplete="off" required ngModel></div>
+              </div>
+              <div class="row mb-1">
+                <div class="col col-4">Type</div>
+                <div class="col">
+                  <select class="form-select" name="type" autocomplete="off" ngModel>
+                    <option value="informatique">Informatique</option>
+                    <option value="simple"> Simple</option>
+                  </select>
+                </div>
+              </div>
+              <button class="btn btn-primary" type="submit">OK</button>
+        </form>
+      </div>
+        
     </div>
   </div>
-  <!-- End Create Product-->
-  
+</div>
+<!-- End Create Product-->

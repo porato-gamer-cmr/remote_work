@@ -45,7 +45,7 @@ class User(models.Model):
 #approv model
 class Approv(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    instant = models.DateTimeField(default=datetime.now() )
+    instant = models.DateTimeField(auto_now_add=True)
     higherDecision = models.IntegerField()
     infoDecision = models.IntegerField()
     message = models.CharField(max_length=200, default="")
@@ -192,9 +192,9 @@ class LigneBudget(models.Model):
 
 
 class Fournisseur(models.Model):
-    name = models.CharField(max_length=200)
-    numero_tier = models.CharField(max_length=200)
-    numero_compte = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
+    numero_tier = models.BigIntegerField()
+    numero_compte = models.BigIntegerField()
 
     def serializable(self):
         return {

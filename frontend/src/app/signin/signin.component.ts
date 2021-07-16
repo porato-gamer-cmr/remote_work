@@ -21,6 +21,9 @@ export class SigninComponent implements OnInit {
 
   constructor(private httpClient: HttpClient, private route: Router) { }
   ngOnInit(): void {
+    if(!this.helper.isTokenExpired(window.localStorage.getItem("token"))){
+      this.route.navigate(['/approv']);
+    }
   }
 
   signin(form: NgForm){

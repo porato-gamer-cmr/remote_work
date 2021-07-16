@@ -1,6 +1,3 @@
-<!-- header of the application-->
-<app-container></app-container>
-
 <div class="row">
   <div class="col">
     <ul class="nav nav-tabs" id="mytab" role="tablist">
@@ -10,7 +7,7 @@
       <li class="nav-item" *ngIf="hasInferior">
         <a class="nav-link" id="profile-tab" data-toggle="tab" href="#otherApprov" role="tab" aria-controls="profile" aria-selected="true">Autres approvs</a>
       </li>
-      <li class="nav-item" *ngIf=" role == 'rmg' || role=='informatique' "  (click)="updateDisplay('True')">
+      <li class="nav-item" *ngIf=" role=='rmg' || role=='informatique' "  (click)="updateDisplay('True')">
         <a class="nav-link" id="contact-tab" data-toggle="tab" href="#rmgApprov" role="tab" aria-controls="contact" aria-selected="true">Demandes</a>
       </li>
       <li class="nav-item" (click)="updateDisplay('True')">
@@ -57,12 +54,12 @@
           </div>
         </div>
         <!--Personnal approvs-->
-        <div class="row" *ngIf="approvs.length == 0 && draft.length == 0">
+        <div class="row" *ngIf="approvs.length == 0">
           <div class="col">
             Aucun élément pour l'instant
           </div>
         </div>
-        <div class="row" id="tableau" *ngIf="approvs.length > 0 || draft.length > 0">
+        <div class="row" id="tableau" *ngIf="approvs.length > 0">
           <div class="col">
               <table class="table table-bordered">
                 <thead>
@@ -88,7 +85,7 @@
                     <td> {{ approv.instant }} </td>
                     <td class="non-align">
                       <button class="btn-fav" (click)="infoApprovs(approv, 'approv')" data-toggle="modal" data-target="#infoApprov"><i class="fa fa-info" title="info"></i></button>
-                      <button class="btn-fav" (click)="infoApprovs(approv, 'approv')" data-toggle="modal" data-target="#modifapprovform" [disabled]=" !((approv.infoDecision==2) || (approv.higherDecision==2) || (approv.higherDecision==-1) || (approv.higherDecision==0)) "><i class="fa fa-pencil"></i></button>
+                      <button class="btn-fav" (click)="infoApprovs(approv, 'approv')" data-toggle="modal" data-target="#modifapprovform" [disabled]=" approv.higherDecision != -1 "><i class="fa fa-pencil"></i></button>
                       <button class="btn-fav" [disabled]=" !(approv.higherDecision==1 && approv.infoDecision==1) " (click)="lockapprov(approv.id)"><i class="fa fa-times-circle"></i></button>
                       <button class="btn-fav" (click)="deleteapprov(approv.id)" [disabled]=" !((approv.infoDecision==2) || (approv.higherDecision==2) || (approv.higherDecision==-1) || (approv.higherDecision==0)) "><i class="fa fa-trash"></i></button>
                     </td>
@@ -211,7 +208,7 @@
                       <td>{{ ticket.id }}</td>
                       <td>
                         <i *ngIf="ticket.userDecision==1" class="fa fa-circle" style="color: green;"></i>
-                        <i *ngIf="ticket.userDecision==0"  class="fa fa-circle" style="color: orange;"></i>
+                        <i *ngIf="ticket.userDecision!=0"  class="fa fa-circle" style="color: orange;"></i>
                       </td>
                       <td> {{ ticket.instant }} </td>
                       <td>
@@ -254,13 +251,13 @@
                     <td>{{ ticket.id }}</td>
                     <td>
                       <i *ngIf="ticket.userDecision==1" class="fa fa-circle" style="color: green;"></i>
-                      <i *ngIf="ticket.userDecision==0"  class="fa fa-circle" style="color: orange;"></i>
+                      <i *ngIf="ticket.userDecision!=1"  class="fa fa-circle" style="color: orange;"></i>
                     </td>
                     <td> {{ ticket.user }} </td>
                     <td> {{ ticket.instant }} </td>
                     <td>
                       <i class="fa fa-info mr-3" (click)="infoTicketApprovs(ticket.id)" data-toggle="modal" data-target="#infoTicketApprovForm"></i>
-                      <i class="fa fa-pencil mr-3" (click)="infoTicketApprovs(ticket.id)" data-toggle="modal" data-target="#modifTicket"></i>
+                      <i class="fa fa-pencil mr-3" (click)="infoTicketApprovs(ticket.id)" *ngIf="ticket.userDecision==2" data-toggle="modal" data-target="#modifTicket"></i>
                       <i class="fa fa-trash mr-3" (click)="deleteTicketApprovs(ticket.id)"></i>
                     </td>
                   </tr>
@@ -317,7 +314,7 @@
             <div class="col"> <button class="btn btn-danger" (click)="decision('annuler', 'informatique')">Annuler</button> </div>
           </div>
           <div class="row" *ngIf="isDraft">
-            <div class="col"> <button class="btn btn-success" (click)="modifApprovs()">Send</button> </div>
+            <div class="col"> <button class="btn btn-success" (click)="modifApprovs('approv')">Send</button> </div>
           </div>
           <i>{{ message }}</i>
         </div>
@@ -458,44 +455,53 @@
             <div class="col col-8"> <input type="text" name="libelle" autocomplete="off" [(ngModel)]="libelle"> </div>
           </div>
           <div class="row mb-1">
+            <div class="col col-4">Type Approv</div>
+            <div class="col col-8">
+                <select class="form-select" name="type" [(ngModel)]="nature" (change)="changeType()">
+                    <option value="informatique">informatique</option>
+                    <option value="simple">simple</option>
+                </select>
+            </div>
+          </div>
+          <div class="row mb-1">
             <div class="col">
                 <select class="form-select" name="product" [(ngModel)]="new_produit">
-                    <option *ngFor="let produit of produits" value="{{ produit.name }}">{{ produit.name }}</option>
+                    <option *ngFor="let produit of produitsFilter" value="{{ produit.name }}">{{ produit.name }}</option>
                 </select>
             </div>
             <div class="col"><input class="form-control" type="number" name="quantity" [(ngModel)]="quantity" autocomplete="off" placeholder="quantité"></div>
             <div class="col"><button  (click)='updateListProd()'><i class="fa fa-check"></i></button></div>
-        </div>
+          </div>
           
-                <table class="table table-bordered">
-                  <thead>
-                    <tr class="first_row_table">
-                      <th>Nom</th>
-                      <th>Quantité</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr class="row_table" *ngFor="let produit of listproduits; let index=index;">
-                      <td>{{ produit.product }}</td>
-                      <td>{{ produit.quantity }}</td>
-                      <td>
-                        <i class="fa fa-trash mr-3" (click)="deleteitem(index)"></i>
-                        <i class="fa fa-pencil mr-3" (click)="modification(index)"></i>
-                      </td>
-    
-                    </tr>
-                  </tbody>
-              </table>
+          <table class="table table-bordered">
+            <thead>
+              <tr class="first_row_table">
+                <th>Nom</th>
+                <th>Quantité</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="row_table" *ngFor="let produit of listproduits; let index=index;">
+                <td>{{ produit.product }}</td>
+                <td>{{ produit.quantity }}</td>
+                <td>
+                  <i class="fa fa-trash mr-3" (click)="deleteitem(index)"></i>
+                  <i class="fa fa-pencil mr-3" (click)="modification(index)"></i>
+                </td>
+
+              </tr>
+            </tbody>
+          </table>
                 
-              <div class="row mb-1">
-                  <div class="col">
-                      <button type="button" (click)="addApprov('save')"><i class="fa fa-check"></i>Save</button>
-                  </div>
-                  <div class="col">
-                    <button type="button" (click)="addApprov('send')"><i class="fa fa-check"></i>Send</button>
-                </div>
+          <div class="row mb-1">
+              <div class="col">
+                  <button type="button" (click)="addApprov('save')"><i class="fa fa-check"></i>Save</button>
               </div>
+              <div class="col">
+                <button type="button" (click)="addApprov('send')"><i class="fa fa-check"></i>Send</button>
+              </div>
+          </div>
                 
         </div>
           
@@ -552,7 +558,8 @@
                 
               <div class="row mb-1">
                   <div class="col">
-                      <button class="btn btn-primary" (click)="modifApprovs()"><i class="fa fa-check"></i>Save</button>
+                      <button *ngIf="isDraft" class="btn btn-primary" (click)="modifApprovs('draft')"><i class="fa fa-check"></i>Save</button>
+                      <button *ngIf="!isDraft" class="btn btn-primary" (click)="modifApprovs('approv')"><i class="fa fa-check"></i>Save</button>
                   </div>
               </div>
                 
@@ -653,7 +660,7 @@ End Create Modal Edit draft-->
                 <td>{{ app.waitingquantity }}</td>
                 <td>{{ app.quantity }}</td>
                 <td>{{ app.reste }}</td>
-                <td><input (keyup)="changeValue(index)" type="number" class="send_value" *ngIf="app.reste > 0"></td>
+                <td><input (keyup)="changeValue(index)" type="number" class="send_value" [disabled]="app.reste > 0"></td>
               </tr>
             </tbody>
           </table>
@@ -672,7 +679,7 @@ End Create Modal Edit draft-->
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Modif Ticket Approv</h5>
+          <h5 class="modal-title">Modif Bordereau</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -682,13 +689,15 @@ End Create Modal Edit draft-->
             <thead>
               <tr class="first_row_table">
                 <th>Produits</th>
-                <th>Qté Restante</th>
+                <th>Qté provi</th>
+                <th>Qté Initial</th>
                 <th>Qté Envoyée</th>
               </tr>
             </thead>
             <tbody>
               <tr class="row_table1" *ngFor="let app of listproduits; let index=index;">
                 <td>{{ app.product }}</td>
+                <td>{{ app.waitingquantity }}</td>
                 <td>{{ app.initialquantity }}</td>
                 <td><input (keyup)="changeValue1(index)" value="{{ app.sendquantity }}" type="number" class="send_value1"></td>
               </tr>

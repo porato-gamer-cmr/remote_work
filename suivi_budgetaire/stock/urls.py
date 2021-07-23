@@ -4,6 +4,7 @@ from .views import produit
 from .views import budget
 from .views import approv
 from .views import ticket_approv
+from .views import reapprov
 
 urlpatterns = [
     #produits
@@ -44,5 +45,23 @@ urlpatterns = [
     path('allLigneFonctionnement/', budget.listeLigneFonctionnement, name='31'),
     path('allPosteInvestissement/', budget.listePosteInvestissement, name='32'),
     path('allLigneInvestissement/', budget.listeLigneInvestissement, name='32'),
+    #bonCommande
+    path('addBonCommande/', reapprov.addBonCommande, name='33'),
+    path('listBonCommande/', reapprov.listBonCommande, name='34'),
+    path('listBonCommandeItem/', reapprov.listBonCommandeItem, name='35'),
+    path('editBonCommande/', reapprov.editBonCommande, name='36'),
+    path('cancelBonCommande/', reapprov.cancelBonCommande, name='37'),
+    path('addFile/', reapprov.addFileToBonCommande, name='38'),
+    path('removeFile/', reapprov.removeFileToBonCommande, name='39'),
+    #fournisseur
+    path('addFournisseur/', produit.addfournisseur, name='40'),
+    path('updateFournisseur/', produit.updatefournisseur, name='41'),
+    path('deleteFournisseur/', produit.deletefournisseur, name='42'),
+    path('listFournisseur/', produit.listfournisseurs, name='43'),
+    #services
+    path('listService/', produit.listservices, name='44'),
+    path('updateService/', produit.updateservice, name='45'),
+    path('addService/', produit.addservice, name='46'),
+    path('deleteService/', produit.deleteservice, name='47')
 
 ]

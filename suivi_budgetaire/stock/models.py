@@ -9,7 +9,7 @@ class Product(models.Model):
     security = models.IntegerField()
     warning = models.IntegerField()
     type = models.CharField(max_length=200)
-    numero_compte = models.CharField(max_length=200)
+    numero_compte = models.BigIntegerField()
 
 
     def serializable(self):
@@ -23,6 +23,21 @@ class Product(models.Model):
             "type": self.type,
             "numero_compte": self.numero_compte
         }
+
+
+
+# Services model
+class Service(models.Model):
+    name = models.CharField(max_length=200, unique=True)
+    numero_compte = models.BigIntegerField()
+ 
+    def serializable(self):
+        return {
+            "id": self.pk,
+            "name": self.name,
+            "numero_compte": self.numero_compte
+        }
+
 
 
 #User model
@@ -195,6 +210,7 @@ class Fournisseur(models.Model):
     name = models.CharField(max_length=200, unique=True)
     numero_tier = models.BigIntegerField()
     numero_compte = models.BigIntegerField()
+    tva = models.FloatField(null=True)
 
     def serializable(self):
         return {
@@ -202,21 +218,24 @@ class Fournisseur(models.Model):
             "name": self.name,
             "numero_tier": self.numero_tier,
             "numero_compte": self.numero_compte,
+            "tva": self.tva
         }
 
 
 class BonCommande(models.Model):
-    instant = models.CharField(max_length=200)
+    instant = models.DateTimeField(auto_now_add=True)
     fournisseur = models.ForeignKey(Fournisseur, on_delete=models.CASCADE)
     numero_piece = models.CharField(max_length=200)
     cgaiDecision = models.IntegerField()
     dgDecision = models.IntegerField()
-    tva = models.FloatField() 
+    ligneBudget = models.ForeignKey(LigneBudget, models.CASCADE)
+    state = models.BooleanField(default=True)
+    #documents = models. 
 
     def serializable(self):
         return {
             "id": self.pk,
-            "instant": self.instant,
+            "instant": str(self.instant.strftime("%x"))+" à "+str(self.instant.strftime("%X")),
             "fournisseur": self.fournisseur,
             "numero_piece": self.numero_piece,
             "cgaiDecision": self.cgaiDecision,

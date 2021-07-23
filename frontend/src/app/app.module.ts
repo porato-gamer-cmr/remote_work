@@ -22,6 +22,7 @@ import { TokenInterceptorService } from './_guards/token-interceptor.service';
 import { BudgetComponent } from './budget/budget.component';
 import { BudgetsService } from './_services/budgets.service';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { ReapprovsService } from './_services/reapprovs.service';
 
 const appRoutes: Routes = [
   {path: 'produits', component: ProduitsComponent, canActivate:[TokenVerificationService]},
@@ -56,7 +57,7 @@ const appRoutes: Routes = [
     RouterModule.forRoot(appRoutes),
     AppRoutingModule,
   ],
-  providers: [ProduitsService, ApprovsService, TicketApprovService, TokenVerificationService, BudgetsService, {
+  providers: [ProduitsService, ApprovsService, TicketApprovService, TokenVerificationService, BudgetsService, ReapprovsService, {
     provide: HTTP_INTERCEPTORS,
     useClass: TokenInterceptorService,
     multi: true

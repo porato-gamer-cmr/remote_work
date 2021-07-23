@@ -158,16 +158,5 @@ i:hover{
     table{
         border:0;
     }
-    .list_contact_send{
-        color:black;
-        width:auto;
-        font-size:0.8em;
-        border:0;
-        padding:8;
-        margin:5px;
-        background: linear-gradient(145deg, #ffffff, #efefef);
-        box-shadow:  2px 2px 10px #b8b8b8, 
-                    -2px -2px 10px #ffffff;
-    }
     
     

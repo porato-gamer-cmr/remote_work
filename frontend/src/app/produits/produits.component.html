@@ -1,5 +1,6 @@
-<div class="card">
+<app-container></app-container>
 
+<div class="card">
   <ul class="nav nav-tabs" id="myTab" role="tablist">
     <li class="nav-item">
       <a class="nav-link active" id="produits-tab" data-toggle="tab" href="#produits" role="tab" aria-controls="produits" aria-selected="true">Produits</a>
@@ -24,7 +25,7 @@
             <input class="input_search" placeholder="search" name="search" [(ngModel)]="e" (keyup)="searchProduit()" autocomplete="off">
         </div>
       </div>
-      <div class="row" id="tableau">
+      <div class="row" id="tableau" *ngIf="produitsFilter.length > 0">
         <div class="col">
           <table class="table table-bordered">
             <thead>
@@ -34,7 +35,7 @@
                 <th>QuantitePro</th>
                 <th>Seuil Securite</th>
                 <th>Alerte</th>
-                <th>Type</th>
+                <th>N° compte</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -45,7 +46,7 @@
                 <td>{{ produit.waitingquantity }}</td>
                 <td>{{ produit.security }}</td>
                 <td>{{ produit.warning }}</td>
-                <td>{{ produit.type }}</td>
+                <td>{{ produit.numero_compte }}</td>
                 <td>
                   <i class="fa fa-pencil mr-3" data-toggle="modal" data-target="#editproduitform" (click)="infoProduits(produit)"></i>
                   <i class="fa fa-trash mr-3" (click)="deleteProduit(produit.id)"></i>
@@ -71,34 +72,28 @@
             <input class="input_search" placeholder="search" name="search" [(ngModel)]="e" (keyup)="searchProduit()" autocomplete="off">
         </div>
       </div>
-      <div class="row" id="tableau">
+      <div class="row" id="tableau" *ngIf="services.length > 0">
         <div class="col">
           <table class="table table-bordered">
             <thead>
               <tr class="first_row_table">
+                <th>N°</th>
                 <th>Nom</th>
-                <th>Quantite</th>
-                <th>QuantitePro</th>
-                <th>Seuil Securite</th>
-                <th>Alerte</th>
-                <th>Type</th>
+                <th>Numéro Compte</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              <tr class="row_table" *ngFor="let produit of produitsFilter; let index=index;">
-                <td>{{ produit.name }}</td>
-                <td>{{ produit.quantity }}</td>
-                <td>{{ produit.waitingquantity }}</td>
-                <td>{{ produit.security }}</td>
-                <td>{{ produit.warning }}</td>
-                <td>{{ produit.type }}</td>
+              <tr class="row_table" *ngFor="let sr of services; let index=index;">
+                <td>{{ index+1 }}</td>
+                <td>{{ sr.name }}</td>
+                <td>{{ sr.numero_compte }}</td>
                 <td>
-                  <i class="fa fa-pencil mr-3" data-toggle="modal" data-target="#editproduitform" (click)="infoProduits(produit)"></i>
-                  <i class="fa fa-trash mr-3" (click)="deleteProduit(produit.id)"></i>
+                  <i class="fa fa-pencil mr-3" data-toggle="modal" data-target="#editserviceform" (click)="infoServices(sr)"></i>
+                  <i class="fa fa-trash mr-3" (click)="deleteService(sr.id)"></i>
                 </td>
               </tr>
-              <tr class="row_table" *ngIf="produitsFilter.length==0">
+              <tr class="row_table" *ngIf="services.length==0">
                 Aucun element
               </tr>
             </tbody>
@@ -107,7 +102,46 @@
       </div>
     </div>
 
-    <div class="tab-pane fade" id="fournisseurs" role="tabpanel" aria-labelledby="fournisseurs-tab">d</div>
+    <div class="tab-pane fade" id="fournisseurs" role="tabpanel" aria-labelledby="fournisseurs-tab">
+      <div class="row">
+        <div class="col">
+          <button class="btn btn-success" data-toggle="modal" data-target="#createfournisseurform"><i class="fa fa-user-plus"></i></button>
+          <button class="btn btn-success" data-toggle="modal" data-target="#"><i class="fa fa-upload"></i></button>
+          <button class="btn btn-success"><i class="fa fa-download"></i></button>
+        </div>
+        <div class="col">
+            <input class="input_search" placeholder="search" name="search" [(ngModel)]="e" (keyup)="searchProduit()" autocomplete="off">
+        </div>
+      </div>
+      <div class="row" id="tableau" *ngIf="fournisseurs.length > 0">
+        <div class="col">
+          <table class="table table-bordered">
+            <thead>
+              <tr class="first_row_table">
+                <th>N°</th>
+                <th>Nom</th>
+                <th>Numéro Compte</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="row_table" *ngFor="let fr of fournisseurs; let index=index;">
+                <td>{{ index+1 }}</td>
+                <td>{{ fr.name }}</td>
+                <td>{{ fr.numero_compte }}</td>
+                <td>
+                  <i class="fa fa-pencil mr-3" data-toggle="modal" data-target="#editfournisseurform" (click)="infoFournisseurs(fr)"></i>
+                  <i class="fa fa-trash mr-3" (click)="deleteFournisseur(fr.id)"></i>
+                </td>
+              </tr>
+              <tr class="row_table" *ngIf="fournisseurs.length==0">
+                Aucun element
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 
 </div>
@@ -143,6 +177,10 @@
               <div class="row mb-1">
                 <div class="col col-4">Alerte</div>
                 <div class="col"><input type="number" name="warning" class="form-control border-secondary" [value]="warning" ngModel autocomplete="off"></div>
+              </div>
+              <div class="row mb-1">
+                <div class="col col-4">N° compte</div>
+                <div class="col"><input type="number" name="numero_compte" class="form-control border-secondary" [value]="numero_compte" ngModel autocomplete="off"></div>
               </div>
               <div class="row mb-1">
                 <div class="col col-4">Type</div>
@@ -191,6 +229,10 @@
                   <div class="col"><input type="number" class="form-control border-secondary" name="warning" autocomplete="off" required ngModel></div>
               </div>
               <div class="row mb-1">
+                <div class="col col-4">N° compte</div>
+                <div class="col"><input type="number" class="form-control border-secondary" name="numero_compte" autocomplete="off" required ngModel></div>
+              </div>
+              <div class="row mb-1">
                 <div class="col col-4">Type</div>
                 <div class="col">
                   <select class="form-select" name="type" autocomplete="off" ngModel>
@@ -207,3 +249,141 @@
   </div>
 </div>
 <!-- End Create Product-->
+
+
+
+
+<!--Start Edit Services -->
+<div class="modal" id="editserviceform">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modifier Service</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="updateService(edit1)" #edit1="ngForm">
+              <div class="row mb-1">
+                <div class="col col-4">Nom</div>
+                <div class="col"><input type="text" name="name" class="form-control border-secondary"  [value]="name" ngModel autocomplete="off"></div>
+              </div>
+              <div class="row mb-1">
+                <div class="col col-4">N° compte</div>
+                <div class="col"><input type="number" name="numero_compte" class="form-control border-secondary" [value]="numero_compte" ngModel autocomplete="off"></div>
+              </div>
+              <br><br><button type="button" class="btn btn-primary" type="submit">OK</button>
+        </form>
+      </div>
+        
+    </div>
+  </div>
+</div>
+<!-- End Edit Service-->
+
+<!--Start Create Service-->
+<div class="modal" id="createserviceform">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Ajouter Service</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="addService(f1)" #f1="ngForm">
+            <div class="row mb-1">
+              <div class="col col-4">Nom</div>
+              <div class="col"><input type="text" class="form-control border-secondary" name="name" autocomplete="off" required ngModel></div>
+            </div>
+            <div class="row mb-1">
+              <div class="col col-4">N° compte</div>
+              <div class="col"><input type="number" class="form-control border-secondary" name="numero_compte" autocomplete="off" required ngModel></div>
+            </div>
+            <button class="btn btn-primary" type="submit">OK</button>
+        </form>
+      </div>
+        
+    </div>
+  </div>
+</div>
+<!-- End Create Service-->
+
+
+
+
+<!--Start Edit Fournisseur -->
+<div class="modal" id="editfournisseurform">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modifier Fournisseur</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="updateFournisseur(edit2)" #edit2="ngForm">
+              <div class="row mb-1">
+                <div class="col col-4">Nom</div>
+                <div class="col"><input type="text" name="name" class="form-control border-secondary"  [value]="name" ngModel autocomplete="off"></div>
+              </div>
+              <div class="row mb-1">
+                <div class="col col-4">N° compte</div>
+                <div class="col"><input type="number" name="numero_compte" class="form-control border-secondary" [value]="numero_compte" ngModel autocomplete="off"></div>
+              </div>
+              <div class="row mb-1">
+                <div class="col col-4">N° tier</div>
+                <div class="col"><input type="number" name="numero_tier" class="form-control border-secondary" [value]="numero_tier" ngModel autocomplete="off"></div>
+              </div>
+              <div class="row mb-1">
+                <div class="col col-4">TVA</div>
+                <div class="col"><input type="number" name="tva" class="form-control border-secondary" [value]="tva" ngModel autocomplete="off"></div>
+              </div>
+              <br><br><button type="button" class="btn btn-primary" type="submit">OK</button>
+        </form>
+      </div>
+        
+    </div>
+  </div>
+</div>
+<!-- End Edit Fournisseur-->
+
+<!--Start Create Fournisseur-->
+<div class="modal" id="createfournisseurform">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Ajouter Fournisseur</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="addFournisseur(f2)" #f2="ngForm">
+            <div class="row mb-1">
+              <div class="col col-4">Nom</div>
+              <div class="col"><input type="text" class="form-control border-secondary" name="name" autocomplete="off" required ngModel></div>
+            </div>
+            <div class="row mb-1">
+              <div class="col col-4">N° compte</div>
+              <div class="col"><input type="number" class="form-control border-secondary" name="numero_compte" autocomplete="off" required ngModel></div>
+            </div>
+            <div class="row mb-1">
+              <div class="col col-4">N° tier</div>
+              <div class="col"><input type="number" class="form-control border-secondary" name="numero_tier" autocomplete="off" required ngModel></div>
+            </div>
+            <div class="row mb-1">
+              <div class="col col-4">TVA</div>
+              <div class="col"><input type="number" class="form-control border-secondary" name="tva" autocomplete="off" required ngModel></div>
+            </div>
+            <button class="btn btn-primary" type="submit">OK</button>
+        </form>
+      </div>
+        
+    </div>
+  </div>
+</div>
+<!-- End Create Fournisseur-->

@@ -51,6 +51,7 @@ urlpatterns = [
     path('listBonCommandeItem/', reapprov.listBonCommandeItem, name='35'),
     path('editBonCommande/', reapprov.editBonCommande, name='36'),
     path('cancelBonCommande/', reapprov.cancelBonCommande, name='37'),
+    path('decisionBonCommande/', reapprov.decisionBonCommande, name='37'),
     path('addFile/', reapprov.addFileToBonCommande, name='38'),
     path('removeFile/', reapprov.removeFileToBonCommande, name='39'),
     #fournisseur
@@ -62,6 +63,12 @@ urlpatterns = [
     path('listService/', produit.listservices, name='44'),
     path('updateService/', produit.updateservice, name='45'),
     path('addService/', produit.addservice, name='46'),
-    path('deleteService/', produit.deleteservice, name='47')
+    path('deleteService/', produit.deleteservice, name='47'),
+    path('upload/', reapprov.upload, name='47'),
+    path('linkFileToBon/', reapprov.linkFileToBon),
+    path('allFile/', reapprov.allFile),
+    path('deleteFile/', reapprov.removeFileToBonCommande),
+    path('getFile/', reapprov.getFile),
+    path('confirmBC/', reapprov.confirmBonCommande)
 
 ]

@@ -69,6 +69,7 @@ export class ApprovsService {
           this.emitApprovsSubject();
           console.log("reussite lors de la récuperation des approvs");
           this.listApprovsItems();
+          this.getApprovStats();
         },
         (error)=>{
           console.log("erreur lors de la récuperation des approvs");

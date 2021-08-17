@@ -45,7 +45,7 @@ export class ProduitsComponent implements OnInit, OnDestroy {
         this.produits = data; this.produitsFilter = this.produits;
       }
     );
-    this.produitsService.listServices();
+    //this.produitsService.listServices();
     this.servicesSubscription = this.produitsService.servicesSubject.subscribe(
       (data: any[])=>{
         this.services = data; 

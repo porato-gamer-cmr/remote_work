@@ -45,6 +45,7 @@ export class BudgetsService {
       (data: any[])=>{
         this.ligneFraisFonctionnement = data;
         this.emitLigneFraisFonctionnement();
+        console.log("Réussite lors de la récupération des lignes");
       }
     );
   }
@@ -61,6 +62,7 @@ export class BudgetsService {
       (data: any[])=>{
         this.ligneFraisInvestissement = data;
         this.emitLigneFraisInvestissement();
+        console.log("Réussite lors de la récupération des lignes");
       }
     );
   }

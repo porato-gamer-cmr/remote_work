@@ -26,6 +26,7 @@ export class ResetPasswordComponent implements OnInit {
       this.areEqual = false;
     }
     else{
+      this.email = (this.helper.decodeToken(this.route.snapshot.params['id'])).email
       this.httpClient.post("http://172.16.16.195:8000/stock/resetPassword/", {password: form.value.password1, email: this.email}).subscribe(
         (data)=>{
           this.message = "Votre mot de passe à  été changé avec succès !!"

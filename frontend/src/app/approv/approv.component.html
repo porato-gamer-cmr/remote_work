@@ -87,9 +87,9 @@
                     <td> {{ approv.instant }} </td>
                     <td class="non-align">
                       <button class="btn-fav" (click)="infoApprovs(approv, 'approv')" data-toggle="modal" data-target="#infoApprov"><i class="fa fa-info" title="info"></i></button>
-                      <button class="btn-fav" (click)="infoApprovs(approv, 'approv')" data-toggle="modal" data-target="#modifapprovform" [disabled]=" approv.higherDecision != -1 "><i class="fa fa-pencil"></i></button>
+                      <button class="btn-fav" (click)="infoApprovs(approv, 'approv')" data-toggle="modal" data-target="#modifapprovform" [disabled]=" approv.higherDecision != -1 || approv.higherDecision != 2 || approv.infoDecision != 2 "><i class="fa fa-pencil"></i></button>
                       <button class="btn-fav" [disabled]=" !(approv.higherDecision==1 && approv.infoDecision==1) " (click)="lockapprov(approv.id)"><i class="fa fa-times-circle"></i></button>
-                      <button class="btn-fav" (click)="deleteapprov(approv.id)" [disabled]=" !((approv.infoDecision==2) || (approv.higherDecision==2) || (approv.higherDecision==-1) || (approv.higherDecision==0)) "><i class="fa fa-trash"></i></button>
+                      <button class="btn-fav" (click)="deleteapprov(approv.id)" [disabled]=" approv.higherDecision!=-1"><i class="fa fa-trash"></i></button>
                     </td>
                   </tr>
                 </tbody>
@@ -210,7 +210,7 @@
                       <td>{{ ticket.id }}</td>
                       <td>
                         <i *ngIf="ticket.userDecision==1" class="fa fa-circle" style="color: green;"></i>
-                        <i *ngIf="ticket.userDecision!=0"  class="fa fa-circle" style="color: orange;"></i>
+                        <i *ngIf="ticket.userDecision!=1"  class="fa fa-circle" style="color: orange;"></i>
                       </td>
                       <td> {{ ticket.instant }} </td>
                       <td>
@@ -260,7 +260,7 @@
                     <td>
                       <i class="fa fa-info mr-3" (click)="infoTicketApprovs(ticket.id)" data-toggle="modal" data-target="#infoTicketApprovForm"></i>
                       <i class="fa fa-pencil mr-3" (click)="infoTicketApprovs(ticket.id)" *ngIf="ticket.userDecision==2" data-toggle="modal" data-target="#modifTicket"></i>
-                      <i class="fa fa-trash mr-3" (click)="deleteTicketApprovs(ticket.id)"></i>
+                      <!-- <i class="fa fa-trash mr-3" (click)="deleteTicketApprovs(ticket.id)"></i> -->
                     </td>
                   </tr>
                 </tbody>
@@ -662,7 +662,7 @@ End Create Modal Edit draft-->
                 <td>{{ app.waitingquantity }}</td>
                 <td>{{ app.quantity }}</td>
                 <td>{{ app.reste }}</td>
-                <td><input (keyup)="changeValue(index)" type="number" class="send_value" [disabled]="app.reste > 0"></td>
+                <td><input *ngIf="app.reste!=0" (keyup)="changeValue(index)" type="number" class="send_value"><i *ngIf="app.reste==0" style="color:grey;">livraison totale pour ce produit</i></td>
               </tr>
             </tbody>
           </table>
@@ -678,7 +678,7 @@ End Create Modal Edit draft-->
 
    <!--Start Livrer produit Modal-->
    <div class="modal" id="modifTicket">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Modif Bordereau</h5>

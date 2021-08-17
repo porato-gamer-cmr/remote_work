@@ -151,7 +151,7 @@ export class ProduitsService {
           console.log("Réussite lors de l ajout de service");
         },
         (error)=>{
-          console.log("Erreur lors de l ajout de service");
+          console.log("Erreur lors de l ajout de service"); 
         }
       );
   }

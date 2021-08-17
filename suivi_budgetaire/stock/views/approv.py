@@ -12,7 +12,7 @@ def approvStats(request):
     payload = tokenVerification(request.headers['Authorization'].split(' ')[1])
     allApprov = Approv.objects.filter(user__id = payload['user_id']).count()
     successApprov = Approv.objects.filter(user__id = payload['user_id'], higherDecision=1, infoDecision=1).count()
-    rejectApprov = Approv.objects.filter(user__id = payload['user_id'], higherDecision=2).filter(user__id = payload['user_id'], infoDecision=2).count()
+    rejectApprov = Approv.objects.filter(user__id = payload['user_id'], higherDecision=2).count() + Approv.objects.filter(user__id = payload['user_id'], infoDecision=2).count()
     cancelApprov = Approv.objects.filter(user__id = payload['user_id'], higherDecision=3).filter(user__id = payload['user_id'], infoDecision=3).count()
     waitingApprov = Approv.objects.filter(user__id = payload['user_id'], higherDecision=1, infoDecision=0).count() + Approv.objects.filter(user__id = payload['user_id'], higherDecision=0, infoDecision=1).count() + Approv.objects.filter(user__id = payload['user_id'], higherDecision=0, infoDecision=0).count()
     draft = Approv.objects.filter(user__id = payload['user_id'], higherDecision=-1).count()
@@ -123,7 +123,7 @@ def listapprovs(request):
 @csrf_exempt
 def listinferiorapprovs(request):
     payload = tokenVerification(request.headers['Authorization'].split(' ')[1])
-    approv = Approv.objects.filter(user__higher__id=payload['user_id'], state=False)
+    approv = Approv.objects.filter(user__higher__id=payload['user_id'], state=False).exclude(higherDecision=-1).exclude(higherDecision=1, infoDecision=1)
     return JsonResponse([app.serializable() for app in approv],  safe=False)
        
 

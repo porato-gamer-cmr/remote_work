@@ -6,6 +6,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 import jwt
 from datetime import datetime
+from django.core.mail import EmailMultiAlternatives
 from .auth import sendingMail
 from .auth import tokenVerification
 from django.core.mail import send_mail, EmailMultiAlternatives
@@ -62,9 +63,9 @@ def addTicketApprovs(request):
     data=Approv.objects.get( id = data['listproduits'][0]['approv'] )
     try:
         send_mail("livraison", "VOus avez recu du materiel", 'jerarlmalim@gmail.com' , [data.user.email], fail_silently = False)
-        send_mail("livraison", "le materiel a ete livré à {0}".format(data.user.email), 'jerarlmalim@gmail.com' , [data.user.higher.name], fail_silently = False)
-        sendingMail(data.user.email, data.user.name)
-        sendingMail(data.user.higher.email, data.user.higher.name)
+        #send_mail("livraison", "le materiel a ete livré à {0}".format(data.user.email), 'jerarlmalim@gmail.com' , [data.user.higher.name], fail_silently = False)
+        #sendingMail(data.user.email, data.user.name)
+        #sendingMail(data.user.higher.email, data.user.higher.name)
     except(Exception):
         print("error")
     return JsonResponse({})
@@ -73,20 +74,21 @@ def addTicketApprovs(request):
 @csrf_exempt
 def modifTicketApprov(request):
     data = json.loads((request.body).decode('utf-8'))
+    print(data)
     tokenVerification(request.headers['Authorization'].split(' ')[1])
     TicketApprov.objects.filter(id=data['listproduits'][0]['ticketapprov']).update(message=data['message'])
     ticketApprov = TicketApprov.objects.get(id=data['listproduits'][0]['ticketapprov'])
     for item in data['listproduits']:
         Product.objects.filter(name=item['product']).update(waitingquantity=F('waitingquantity') + TicketApprovItem.objects.filter(ticketapprov=item['ticketapprov'], product=item['product'])[0].sendquantity )
         Product.objects.filter(name=item['product']).update(waitingquantity=F('waitingquantity') - item['sendquantity'])
-        ApprovItem.objects.filter(product__name=item['product'], approv=ticketApprov.approv).update(sendquantity=F('sendquantity') - TicketApprovItem.objects.filter(ticketapprov=item['ticketapprov'], product=item['product'])[0].sendquantity, message="")
-        ApprovItem.objects.filter(product__name=item['product'], approv=ticketApprov.approv).update(sendquantity=F('sendquantity') + item['sendquantity'], message="")
+        ApprovItem.objects.filter(product__name=item['product'], approv=ticketApprov.approv).update(sendquantity=F('sendquantity') - TicketApprovItem.objects.filter(ticketapprov=item['ticketapprov'], product=item['product'])[0].sendquantity)
+        ApprovItem.objects.filter(product__name=item['product'], approv=ticketApprov.approv).update(sendquantity=F('sendquantity') + item['sendquantity'])
         TicketApprovItem.objects.filter(ticketapprov=item['ticketapprov'], product=item['product']).update(sendquantity=item['sendquantity'])
-        try:
-            sendingMail(data.user.email, data.user.name)
-            sendingMail(data.user.higher.email, data.user.higher.name)
-        except(Exception):
-            print("error")
+    try:
+        sendingMail(data.user.email, data.user.name)
+        sendingMail(data.user.higher.email, data.user.higher.name)
+    except(Exception):
+        print("error")
     return JsonResponse({"message": "well done"})
 
 

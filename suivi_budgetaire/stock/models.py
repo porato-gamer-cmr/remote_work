@@ -80,36 +80,6 @@ class Approv(models.Model):
         }
 
 
-#draft model
-class Draft(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    instant = models.DateTimeField(default=datetime.now)
-    libelle = models.CharField(max_length=200, default="")
-
-    def serializable(self):
-        return {
-            "id": self.pk,
-            "user": self.user.name,
-            "instant": str(self.instant.strftime("%x"))+" à "+str(self.instant.strftime("%X")),
-            "libelle": self.libelle
-        }
-
-
-#draftItem
-class DraftItem(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.IntegerField()
-    draft = models.ForeignKey(Draft, on_delete=models.CASCADE)
-
-    def serializable(self):
-        return {
-            "id": self.pk,
-            "product": self.product.name,
-            "quantity": self.quantity,
-            "draft": self.draft.pk,
-        }
-
-
 
 #ApprovItem model
 class ApprovItem(models.Model):
@@ -169,12 +139,6 @@ class Log(models.Model):
     instant=models.DateTimeField(default=datetime.now)
 
 
-#model for file upload 
-class UploadFile(models.Model):
-    title = models.TextField(default="texte par defaut")
-    cover = models.ImageField(upload_to='images/', null=True, blank=True)
-
-
 
 class PosteBudget(models.Model):
     name = models.TextField(max_length=255)
@@ -225,22 +189,23 @@ class Fournisseur(models.Model):
 class BonCommande(models.Model):
     instant = models.DateTimeField(auto_now_add=True)
     fournisseur = models.ForeignKey(Fournisseur, on_delete=models.CASCADE)
-    numero_piece = models.CharField(max_length=200)
-    cgaiDecision = models.IntegerField()
-    dgDecision = models.IntegerField()
+    #numero_piece = models.CharField(max_length=200)
+    cgaiDecision = models.BooleanField(default=False)
+    dgDecision = models.BooleanField(default=False)
     ligneBudget = models.ForeignKey(LigneBudget, models.CASCADE)
-    state = models.BooleanField(default=True)
+    state = models.IntegerField(default=0)
     #documents = models. 
 
     def serializable(self):
         return {
             "id": self.pk,
             "instant": str(self.instant.strftime("%x"))+" à "+str(self.instant.strftime("%X")),
-            "fournisseur": self.fournisseur,
-            "numero_piece": self.numero_piece,
+            "fournisseur": self.fournisseur.name,
+            "numero_piece": self.pk,
             "cgaiDecision": self.cgaiDecision,
             "dgDecision": self.dgDecision,
-            "tva": self.tva
+            "ligne_budget": self.ligneBudget.name,
+            "amount": self.ligneBudget.amount
         }
 
 
@@ -258,3 +223,17 @@ class BonCommandeItem(models.Model):
             "quantity": self.quantity,
             "bon_commande": self.bon_commande.pk
         }
+
+
+#model for file upload 
+class UploadFile(models.Model):
+    bonCommande = models.ForeignKey(BonCommande, on_delete=models.CASCADE, null=True)
+    path = models.FileField(upload_to='images/', null=True, blank=True)
+
+    def serializable(self):
+        return {
+            "id": self.pk,
+            "bon_commande": self.bonCommande.pk,
+            "path": ((self.path.name).split('/'))[1]
+        }
+

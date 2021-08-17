@@ -1,17 +1,49 @@
 <app-container></app-container>
 
 <div class="card">
-    <div class="row">
-        <div class="col">
-            <button class="btn btn-success" data-toggle="modal" data-target="#bondecommande"><i class="fa fa-user-plus"></i></button>
-            <button class="btn btn-success" data-toggle="modal" data-target="#"><i class="fa fa-upload"></i></button>
-            <button class="btn btn-success"><i class="fa fa-download"></i></button>
-        </div>
-        <div class="col">
-            <input class="input_search" placeholder="search"  autocomplete="off">
-        </div>
+  <div class="row" *ngIf="role=='rmg' ">
+    <div class="col">
+        <button class="btn btn-success" data-toggle="modal" data-target="#bondecommande" (click)='reset()'><i class="fa fa-user-plus"></i></button>
+        <button class="btn btn-success" data-toggle="modal" data-target="#"><i class="fa fa-upload"></i></button>
+        <button class="btn btn-success"><i class="fa fa-download"></i></button>
     </div>
+    <div class="col">
+        <input class="input_search" placeholder="search"  autocomplete="off">
+    </div>
+  </div>
+  <div class="row" id="tableau" >
+    <div class="col">
+      <table class="table table-bordered">
+        <thead>
+          <tr class="first_row_table">
+            <th>N°</th>
+            <th>Date</th>
+            <th>Fournisseur</th>
+            <th>Objet</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row_table" *ngFor="let bn of bonCommandes; let index=index;">
+            <td>{{ bn.numero_piece }}</td>
+            <td>{{ bn.instant }}</td>
+            <td>{{ bn.fournisseur }}</td>
+            <td>{{ bn.ligne_budget }}</td>
+            <td>
+              <i class="fa fa-info mr-3" data-toggle="modal" data-target="#info_print_commande" (click)="infoBonCommande(bn)" title="info"></i>
+              <i class="fa fa-trash mr-3" (click)="cancelBonCommande(bn.id)" *ngIf="role=='rmg' " title="annuler"></i>
+              <i class="fa fa-check mr-3" (click)="confirmBonCommande(bn.id)" *ngIf="role=='rmg' " title="confirmer"></i>
+            </td>
+          </tr>
+          <tr class="row_table" *ngIf="bonCommandes.length==0">
+            Aucun element
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
+
   
     <!--Start Create ReApprov Modal-->
     <div class="modal" id="bondecommande">
@@ -27,7 +59,7 @@
             <div class="row mb-1">
               <div class="col col-4"> Fournisseur </div>
               <div class="col col-8"> 
-                <input class="form-control" type="text" name="fournisseur" [(ngModel)]="fournisseur" placeholder="fournisseur" list="data">
+                <input class="form-control" type="text" name="fournisseur" [(ngModel)]="fournisseur" placeholder="fournisseur" list="data" (change)='changement()'>
                 <datalist id="data">
                   <option *ngFor="let item of fournisseurs" [value]="item.name">{{ item.name }}</option>
                 </datalist>
@@ -44,108 +76,154 @@
               </div>
             <div class="row mb-1">
               <div class="col">
-                  <select class="form-select" name="product" [(ngModel)]="product">
-                      <option *ngFor="let product of produits" value="{{ product.name }}">{{ product.name }}</option>
-                  </select>
+                <input class="form-control" type="text" name="product" [(ngModel)]="product" placeholder="poduit ou service" list="data2">
+                <datalist id="data2">
+                  <option *ngFor="let item of produits" [value]="item.name">{{ item.name }}</option>
+                </datalist>
               </div>
               <div class="col"><input class="form-control" type="number" name="quantity" [(ngModel)]="quantity" placeholder="quantité"></div>
               <div class="col"><input class="form-control" type="number" name="unit_price" [(ngModel)]="unit_price" placeholder="prix unitaire"></div>
-              <div class="col"><button (click)="updateList()"><i class="fa fa-check"></i></button></div>
+              <div class="col"><button class="btn btn-primary" (click)="updateList()"><i class="fa fa-check"></i></button></div>
             </div>
             
-                  <table class="table table-bordered">
-                    <thead>
-                      <tr class="first_row_table">
-                        <th>N°</th>
-                        <th>Nom</th>
-                        <th>Quantité</th>
-                        <th>Prix Unitaire</th>
-                        <th>Prix Totale</th>
-                        <th>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr class="row_table" *ngFor="let item of listproduits; let index=index;">
-                        <td>{{ index+1 }}</td>
-                        <td>{{ item.product }}</td>
-                        <td>{{ item.quantity }}</td>
-                        <td>{{ item.unit_price }}</td>
-                        <td>{{ item.total_price }}</td>
-                        <td>
-                          <i class="fa fa-trash mr-3" (click)="deleteItem(index)"></i>
-                          <i class="fa fa-pencil mr-3" (click)="focusItem(index)"></i>
-                        </td>
-      
-                      </tr>
-                    </tbody>
-                </table>
+            <table class="table table-bordered">
+              <thead>
+                <tr class="first_row_table">
+                  <th>N°</th>
+                  <th>Nom</th>
+                  <th>Quantité</th>
+                  <th>PU H TVA</th>
+                  <th>PT H TVA</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="row_table" *ngFor="let item of listproduits; let index=index;">
+                  <td>{{ index+1 }}</td>
+                  <td>{{ item.product }}</td>
+                  <td>{{ item.quantity }}</td>
+                  <td>{{ item.unit_price }}</td>
+                  <td>{{ item.total_price }}</td>
+                  <td>
+                    <i class="fa fa-trash mr-3" (click)="deleteItem(index)"></i>
+                    <i class="fa fa-pencil mr-3" (click)="focusItem(index)"></i>
+                  </td>
+                </tr>
+                <tr *ngIf="listproduits.length > 0">
+                  <td rowspan="2" colspan="4"></td>
+                  <td>H TVA</td>
+                  <td>{{ htc_price }}</td>
+                </tr>
+                <tr *ngIf="listproduits.length > 0">
+                  <td>TVA 19,25%</td>
+                  <td>{{ tva_price}}</td>
+                </tr>
+                <tr *ngIf="listproduits.length > 0">
+                  <td colspan="4">PRIX TOTAL</td>
+                  <td>TTC FCFA</td>
+                  <td>{{ bill_price }}</td>
+                </tr>
+              </tbody>
+          </table>
                   
-                <div class="row mb-1">
-                    <div class="col">
-                        <button type="button" (click)="addBonCommande()"><i class="fa fa-check"></i>Save</button>
-                    </div>
-                    <div class="col">
-                      Prix Totale: {{ bill_price }}
-                  </div>
-                </div>
+          <div class="row mb-1">
+              <div class="col">
+                  <button type="button" (click)="addBonCommande()"><i class="fa fa-check"></i>Save</button>
+              </div>
+          </div>
                   
           </div>
             
         </div>
       </div>
     </div>
-  
-  
-  
-  
-     <!--Start Report Bon De Commande-->
-     <div class="modal" id="report_bondecommande">
+
+    <!--ENd-->
+
+
+    <!--Start Create ReApprov Modal-->
+    <div class="modal" id="info_print_commande">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">BON DE COMMANDE</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
+            <h5 class="modal-title">{{ date }}</h5>
           </div>
           <div class="modal-body">
+            <div id="test">
             <div class="row mb-1">
-              <div class="col col-4"> Fournisseur </div>
-              <div class="col col-8"> {{ fournisseur }} </div>
+              <div class="col"> Fournisseur: {{ fournisseur }} </div>
             </div>
-              <table class="table table-bordered">
-                <thead>
-                  <tr class="first_row_table">
-                    <th>N°</th>
-                    <th>Nom</th>
-                    <th>Quantité</th>
-                    <th>Prix Unitaire</th>
-                    <th>Prix Totale</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr class="row_table" *ngFor="let item of listproduits; let index=index;">
-                    <td>{{ index+1 }}</td>
-                    <td>{{ item.product }}</td>
-                    <td>{{ item.quantity }}</td>
-                    <td>{{ item.unit_price }}</td>
-                    <td>{{ item.total_price }}</td>
-                  </tr>
-                </tbody>
-                </table>
-                  
-                <div class="row mb-1">
-                    <div class="col">
-                        <button type="button" (click)="addBonCommande()"><i class="fa fa-check"></i>Save</button>
-                    </div>
-                    <div class="col">
-                      Prix Totale: {{ bill_price }}
-                  </div>
-                </div>
+            <div class="row mb-1">
+              <div class="col"> Object: {{ ligne_budget }} // {{ ligne_budget }} </div>
+            </div>
+            <table class="table table-bordered">
+              <thead>
+                <tr class="first_row_table">
+                  <th>N°</th>
+                  <th>DESIGNATION</th>
+                  <th>PRIX UNITAIRE</th>
+                  <th>QUNATITE</th>
+                  <th>MONTANT TOTAL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="row_table" *ngFor="let item of listproduits; let index=index;">
+                  <td>{{ index+1 }}</td>
+                  <td>{{ item.product }}</td>
+                  <td>{{ item.unit_price }}</td>
+                  <td>{{ item.quantity }}</td>
+                  <td>{{ item.total_price }}</td>
+                </tr>
+                <tr>
+                  <td rowspan="2" colspan="3"></td>
+                  <td>H TVA</td>
+                  <td>{{ htc_price }}</td>
+                </tr>
+                <tr>
+                  <td>TVA 19,25%</td>
+                  <td>{{ tva_price}}</td>
+                </tr>
+                <tr>
+                  <td colspan="3">PRIX TOTAL</td>
+                  <td>TTC FCFA</td>
+                  <td>{{ bill_price }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="row my-3" style="margin-left: 7px;">
+              <div class="col">Total en lettres: {{ montant_en_lettre }}</div>
+            </div>
+            <div class="row" style="margin-left: 7px;">
+              <div class="col">Visa Responsable des Moyens Généraux</div>
+              <div class="col">Visa Directeur Général</div>
+            </div>
+            <!--end of printed content-->
+            </div>  
+            <div class="row" *ngIf="role=='cgai' || role=='dg' ">
+              <div class="col">
+                <button type="button" (click)="decisionBonCommande('valider')"><i class="fa fa-check"></i>valider</button>
+              </div>
+              <div class="col">
+                <button type="button" (click)="decisionBonCommande('rejeter')"><i class="fa fa-check"></i>rejeter</button>
+              </div>
+            </div>
+            <div class="row mb-1">
+              <div class="col" *ngIf='printable'>
+                  <button type="button" (click)="openPDF()"><i class="fa fa-check"></i>print</button>
+              </div>
+              <div class="col" *ngIf=" role== 'rmg' ">
+                <input type="file" (change)='upload($event)' multiple accept=".pdf">
+              </div>
+            </div>
+            <div class="row mb-1">
+              <div class="col">
+                  <li *ngFor='let item of file'><span style="cursor: pointer;" (click)='getFile(item.id)'>{{ item.path }}</span> <span style="color: red; cursor: pointer;" (click)='deleteFile(item.id)'>&times;</span></li>
+              </div>
+            </div>
                   
           </div>
             
         </div>
       </div>
     </div>
- 

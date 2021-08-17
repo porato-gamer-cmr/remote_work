@@ -8,7 +8,7 @@
     <li class="nav-item" >
       <a class="nav-link" routerLink='/approv'>Approv</a>
     </li>
-    <li class="nav-item" >
+    <li class="nav-item" *ngIf=" role == 'rmg' || role == 'dg' || role == 'cgai'">
       <a class="nav-link" routerLink='/reapprov'>ReApprov</a>
     </li>
     <li class="nav-item" *ngIf=" role == 'rmg' ">

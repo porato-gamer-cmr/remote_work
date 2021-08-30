@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   // url define the path to target api from the backend
-  url: "http://172.16.16.195:8000/stock/"
+  url: "http://172.16.16.61:8000/stock/"
 };
 
 /*
